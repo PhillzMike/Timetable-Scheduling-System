@@ -6,6 +6,6 @@ using System.Threading.Tasks;
 
 namespace SchedulingSystem {
     //Seyi
-    class Lecturer {
+    public class Lecturer {
     }
 }

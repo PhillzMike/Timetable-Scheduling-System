@@ -6,17 +6,36 @@ using System.Threading.Tasks;
 
 namespace SchedulingSystem
 {
-    abstract class Course
+   public class Course
     {
         private string code;
         private int weeklyClassHours;
         private int weeklyLabHours;
+        private int level;
+        private List<Lecturer> lecturers;
         private int startTimeFrame;
         private int endTimeFrame;
         private List<string> validDays;
-        private int level;
-        private List<Lecturer> lecturers;
 
+        public Course(string code, int weeklyClassHours, int weeklyLabHours, int level, List<Lecturer> lecturers)
+        :this(code,weeklyClassHours,weeklyLabHours,0,0,new List<string> { "Monday", "Tuesday" },level,lecturers){
+        }
+        public Course(string code, int weeklyClassHours, int weeklyLabHours, int level, List<Lecturer> lecturers, int startTimeFrame, int endTimeFrame) 
+            : this(code, weeklyClassHours, weeklyLabHours,startTimeFrame,endTimeFrame, new List<string> { "Monday", "Tuesday" }, level, lecturers)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="code">The course code</param>
+        /// <param name="weeklyClassHours">the number of lecture hours the course should be allocated in a week</param>
+        /// <param name="weeklyLabHours">the number of lab hours the course shoould be allocated in a week</param>
+        /// <param name="startTimeFrame"></param>
+        /// <param name="endTimeFrame"></param>
+        /// <param name="validDays">the days the course is valid for</param>
+        /// <param name="level">the level the course is studied</param>
+        /// <param name="lecturers">the lecturers taking the course</param>
         public Course(string code, int weeklyClassHours, int weeklyLabHours, int startTimeFrame, int endTimeFrame, List<string> validDays, int level, List<Lecturer> lecturers)
         {
             this.code = code;
@@ -24,9 +43,17 @@ namespace SchedulingSystem
             this.weeklyLabHours = weeklyLabHours;
             this.startTimeFrame = startTimeFrame;
             this.endTimeFrame = endTimeFrame;
-            this.validDays = validDays;
             this.level = level;
-            this.lecturers = lecturers;
+            this.lecturers = new List<Lecturer>();
+            this.validDays = new List<string>();
+            foreach (var day in validDays)
+            {
+                this.validDays.Add(day);
+            }
+            foreach (var lecturer in lecturers)
+            {
+                this.lecturers.Add(lecturer);
+            }
         }
 
         public string Code { get => code; }
@@ -34,9 +61,9 @@ namespace SchedulingSystem
         public int WeeklyLabHours { get => weeklyLabHours; }
         public int StartTimeFrame { get => startTimeFrame; }
         public int EndTimeFrame { get => endTimeFrame; }
-        public List<string> ValidDays { get => validDays; }
-        public int Level { get => level; set => level = value; }
-        internal List<Lecturer> Lecturers { get => lecturers;}
+        public List<string> ValidDays { get => new List<string>(validDays); }
+        public int Level { get => level;}
+        public List<Lecturer> Lecturers { get => new List<Lecturer>(lecturers);}
 
     }
 }
