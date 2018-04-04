@@ -30,10 +30,10 @@ namespace SchedulingSystem
         {
             this.adjacencyMatrix[repVertex[v], repVertex[v1]] = 0;
         }
-        //public void SetEdge(T v, T v1, int cost)
-        //{
-        //    this.adjacencyMatrix[repVertex[v], repVertex[v1]] = cost;
-        //}
+        public void SetEdge(T v, T v1, int cost)
+        {
+            this.adjacencyMatrix[repVertex[v], repVertex[v1]] = cost;
+        }
 
         public int GetEdgeCount(T v, T v1)
         {
@@ -47,8 +47,7 @@ namespace SchedulingSystem
             {
                 for(int j = 0; j < adjacencyMatrix.GetLength(1); j++)
                 {
-                    //TODO change this guy to allow cost
-                    numberOfEdges[i] += adjacencyMatrix[i, j];
+                    numberOfEdges[i] += (adjacencyMatrix[i, j] > 0) ? 1 : 0;
                 }
             }
             Array.Sort(numberOfEdges);
