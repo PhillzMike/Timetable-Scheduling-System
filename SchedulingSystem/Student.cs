@@ -9,5 +9,10 @@ namespace SchedulingSystem
     //Peace
     public class Student
     {
+
+        public Student(String name, int level, List<Course> courses)
+        {
+
+        }
     }
 }
