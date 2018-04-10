@@ -59,8 +59,8 @@ namespace SchedulingSystem
         public string Code { get => code; }
         public int WeeklyClassHours { get => weeklyClassHours;  }
         public int WeeklyLabHours { get => weeklyLabHours; }
-        public int StartTimeFrame { get => startTimeFrame; }
-        public int EndTimeFrame { get => endTimeFrame; }
+        public DateTime StartTimeFrame { get => startTimeFrame; }
+        public DateTime EndTimeFrame { get => endTimeFrame; }
         public List<string> ValidDays { get => new List<string>(validDays); }
         public int Level { get => level;}
         public List<Lecturer> Lecturers { get => new List<Lecturer>(lecturers);}
