@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace SchedulingSystem {
     //3dO
-    class Timetable {
+    public class Timetable {
+
     }
 }
