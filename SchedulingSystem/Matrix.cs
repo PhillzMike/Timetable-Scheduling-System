@@ -42,16 +42,17 @@ namespace SchedulingSystem
 
         private int[] SortVertex()
         {
-            var numberOfEdges = new int[adjacencyMatrix.GetLength(0)];
+            var numberOfEdges = new Dictionary<int, int>();
             for(int i = 0; i < adjacencyMatrix.GetLength(0); i++)
             {
+                numberOfEdges.Add(i, 0);
                 for(int j = 0; j < adjacencyMatrix.GetLength(1); j++)
                 {
                     numberOfEdges[i] += (adjacencyMatrix[i, j] > 0) ? 1 : 0;
                 }
             }
-            Array.Sort(numberOfEdges);
-            return numberOfEdges;
+            var sorted = new SortedDictionary<int,int>(numberOfEdges);
+            return sorted.Keys.ToArray();
         }
         //TODO: Check this delegate
         /// <summary>
