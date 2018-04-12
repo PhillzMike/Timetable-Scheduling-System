@@ -12,14 +12,18 @@ namespace SchedulingSystem
     class Input
     {
         public Tuple<DateTime, DateTime> timeFrame;
-         String InfoTable;
-         Dictionary<String, Course> AllCourses;
+        public String InfoTable;
+        public Dictionary<String, Course> AllCourses;
+        public List<Venue> Venues;
         public Input(string Datatable, Tuple<DateTime, DateTime> timeSchedule)
         {
             this.InfoTable = Datatable;
             this.timeFrame = timeSchedule;
-            
-
+            Venues =  new List<Venue>();
+            GenerateStudents(ReadInput(1));
+            GenerateCourses(ReadInput(2));
+            GenerateLecturers(ReadInput(3));
+            GenerateVenues(ReadInput(4));
         }
         
         public  Excel.Range ReadInput( int sheetnumber)
@@ -31,10 +35,7 @@ namespace SchedulingSystem
 
             return PartUsed;
         }
-        public  void SpecifiedTable( int sheetnumber)
-        {
-            ReadInput(sheetnumber);
-        }
+        
 
         public List<Student> GenerateStudents(Excel.Range sp)
         {
@@ -63,7 +64,7 @@ namespace SchedulingSystem
                     }
                     //create a Student objets and adds it to the list of Students
                     studentList.Add(new Student(name, level, coursesOffered));
-                    coursesOffered.Clear();
+                  
                 }
                 else
                 {
@@ -159,7 +160,7 @@ namespace SchedulingSystem
                
         public List<Venue> GenerateVenues(Excel.Range sp)
         {
-            List<Venue> Venues = new List<Venue>();
+         
             bool isLab = false;
             for (int i = 3; i < sp.Rows.Count; i++)
 
