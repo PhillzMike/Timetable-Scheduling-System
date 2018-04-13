@@ -40,7 +40,7 @@ namespace SchedulingSystem {
         }
         List<HashSet<Course>> CanBeTogether;
         Dictionary<Course, List<int>> Course_sets;
-        Dictionary<Course, int> HoursLeft;
+        Dictionary<Course, Tuple<int,int>> HoursLeft;
         Graph<HashSet<Course>> Diff_days;
         List<List<HashSet<Course>>> Days;
         void ClusterTogether(){
@@ -77,15 +77,77 @@ namespace SchedulingSystem {
         }
 
         void Separate(List<HashSet<HashSet<Course>>> TimeT) {
-            List<List<HashSet<Course>>> FinalTT = new List<List<HashSet<Course>>>();
+            List<List<List<Course>>> FinalTT = new List<List<List<Course>>>();
+            foreach(HashSet<HashSet<Course>> DayPeriods in TimeT) {
+                
+                foreach(HashSet<Course> SinglePeriod in DayPeriods) {
+                    foreach(Course c in SinglePeriod) {
+                        if (HoursLeft.ContainsKey(c)) {
+                            HoursLeft[c] = new Tuple<int, int>(c.WeeklyHours, HoursLeft[c].Item2 + 1);
+                        } else {
+                            HoursLeft.Add(c,new Tuple<int,int>(c.WeeklyHours, 1));
+                        }
+                    }
+                }
+            }
+            Random r = new Random();
+            foreach (HashSet<HashSet<Course>> DayPeriods in TimeT) {
+                List < List < Course > > Periods = new List<List<Course>>();
+                foreach (HashSet<Course> SinglePeriod in DayPeriods) {
+                    List<Course> thisPeriod = new List<Course>();
+                    foreach (Course c in SinglePeriod) {
+                        if (r.Next(10) < (((double)HoursLeft[c].Item1 / (double)HoursLeft[c].Item2) * 10)) {
+                            thisPeriod.Add(c);
+                            HoursLeft[c] = new Tuple<int, int>(HoursLeft[c].Item1 - 1, HoursLeft[c].Item2 - 1);
+                        } else {
+                            HoursLeft[c] = new Tuple<int, int>(HoursLeft[c].Item1, HoursLeft[c].Item2 - 1);
+                        }
+                    }
+                    Periods.Add(thisPeriod);
+                }
+                FinalTT.Add(Periods);
+            }
         }
         int Score(List<HashSet<HashSet<Course>>> TimeT) {
-            throw new NotImplementedException();
+            Dictionary<Course, int> Remaining = new Dictionary<Course, int>();
+            foreach (HashSet<HashSet<Course>> DayPeriods in TimeT) {
+
+                foreach (HashSet<Course> SinglePeriod in DayPeriods) {
+                    foreach (Course c in SinglePeriod) {
+                        if (Remaining.ContainsKey(c)) {
+                            Remaining[c]--;
+                            if (Remaining[c] <= 0) {
+                                Remaining.Remove(c);
+                            }
+                        }
+                    }
+                }
+            }
+            int ret = 0;
+            foreach(Course left in Remaining.Keys) {
+                ret += Remaining[left];
+            }
+            return ret;
         }
         List<HashSet<int>> Combin(int tot,int count) {
-            throw new NotImplementedException();
+            CombinC = new List<HashSet<int>>();
+            CombinCode(tot, count, new HashSet<int>());
+            return CombinC;
         }
-    
+        List<HashSet<int>> CombinC;
+        void CombinCode(int tot,int count,HashSet<int> prev) {
+            for(int i = 0; i < tot; i++) {
+                if (!prev.Contains(i)) {
+                    prev.Add(i);
+                    if (count == 1) {
+                        CombinC.Add(new HashSet<int>(prev));
+                    } else {
+                        CombinCode(tot, count - 1, prev);
+                    }
+                    prev.Remove(i);
+                }
+            }
+        }
     }
 
 }
