@@ -114,7 +114,7 @@ namespace SchedulingSystem
         }
         //public bool Validate(List<Course> courses, Course course)
         //{
-        //    //TODO add Student
+        //    //TOrDO add Student
         //    foreach (var item in courses)
         //    {
         //        if(item.Lecturers.Intersect(course.Lecturers).Count() != 0)
