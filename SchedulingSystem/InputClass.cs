@@ -14,16 +14,19 @@ namespace SchedulingSystem
         public Tuple<DateTime, DateTime> timeFrame;
         public String InfoTable;
         public Dictionary<String, Course> AllCourses;
-        public List<Venue> Venues;
+        public List<Venue> AllVenues;
+        public List<Student> AllStudents;
+        public List<Lecturer> AllLecturers;
         public Input(string Datatable, Tuple<DateTime, DateTime> timeSchedule)
         {
             this.InfoTable = Datatable;
             this.timeFrame = timeSchedule;
-            Venues =  new List<Venue>();
-            GenerateStudents(ReadInput(1));
             GenerateCourses(ReadInput(2));
-            GenerateLecturers(ReadInput(3));
-            GenerateVenues(ReadInput(4));
+
+            AllStudents = GenerateStudents(ReadInput(1));
+           
+            AllLecturers = GenerateLecturers(ReadInput(3));
+            AllVenues =  GenerateVenues(ReadInput(4));
         }
         
         public  Excel.Range ReadInput( int sheetnumber)
@@ -55,6 +58,7 @@ namespace SchedulingSystem
                             if (AllCourses.ContainsKey(sp.Cells[i, j].Value2))
                             {
                                 coursesOffered.Add(AllCourses[sp.Cells[i, j].Value2]);
+                                
                             }
                             else
                             {
@@ -63,8 +67,10 @@ namespace SchedulingSystem
                         }
                     }
                     //create a Student objets and adds it to the list of Students
-                    studentList.Add(new Student(name, coursesOffered, level));
-                  
+                    Student nStu = new Student(name, coursesOffered, level);
+                    studentList.Add(nStu);
+                    foreach (Course c in coursesOffered)
+                        c.Students.Add(nStu);
                 }
                 else
                 {
@@ -116,7 +122,7 @@ namespace SchedulingSystem
                 Course courseinfo = new Course(code, wCH, wLH, level, sTF, eTF, nvD);
                 if (AllCourses.ContainsKey(code))
                     Error("Course code aready exist and so was skipped");
- else
+                else
                   AllCourses.Add(code, courseinfo);
             }
             
@@ -147,8 +153,10 @@ namespace SchedulingSystem
                         }
                     }
                     //create a Student objets and adds it to the list of Students
-                    AllLecturers.Add(new Lecturer(lecturername, LecturerCourses));
-                    LecturerCourses.Clear();
+                    Lecturer lect = new Lecturer(lecturername, LecturerCourses);
+                    AllLecturers.Add(lect);
+                    foreach (Course l in LecturerCourses)
+                        l.Lecturers.Add(lect);
                 }
                 else
                 {
@@ -160,27 +168,26 @@ namespace SchedulingSystem
                
         public List<Venue> GenerateVenues(Excel.Range sp)
         {
-         
-            bool isLab = false;
+
+            List<Venue> Venues= new List<Venue>();
             for (int i = 3; i < sp.Rows.Count; i++)
 
             {
-              if (string.IsNullOrWhiteSpace(sp.Cells[i, 1].Value2 + "") || string.IsNullOrWhiteSpace(sp.Cells[i, 2].Value2 + ""))
+                bool isLab = false;
+                if (string.IsNullOrWhiteSpace(sp.Cells[i, 1].Value2 + "") || string.IsNullOrWhiteSpace(sp.Cells[i, 2].Value2 + ""))
                    continue;
                  string VenueName= sp.Cells[i, 1];
                  int VenueCapacity = (int)sp.Cells[i, 2];
                  string LabType = "";
 
-             if (string.IsNullOrWhiteSpace(sp.Cells[i, 1].Value2 + "")) { 
+             if (!string.IsNullOrWhiteSpace(sp.Cells[i, 1].Value2 + "")) { 
                     LabType = sp.Cells[i, 3];
                 }
-                else
-                {
-                    if (LabType == "TRUE")
+               LabType =  LabType.ToLower().Trim();
+                    if (LabType == "true")
                         isLab = true;
                     else
                         isLab = false;
-                }
 
                 Venues.Add(new Venue(VenueName, VenueCapacity, isLab));
             }
