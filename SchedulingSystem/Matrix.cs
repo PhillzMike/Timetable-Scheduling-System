@@ -7,28 +7,40 @@ using System.Threading.Tasks;
 namespace SchedulingSystem
 {
     //Timi
-    public class Graph
+    public class Graph<T>
     {
-        private Dictionary<Course, int> repVertex;
-        private bool[,] adjacencyMatrix;
-        public Graph(List<Course> vertices)
+        private Dictionary<T, int> repVertex;
+        private int[,] adjacencyMatrix;
+        public Graph(IEnumerable<T> vertices)
         {
-            this.repVertex = new Dictionary<Course, int>();
-            this.adjacencyMatrix = new bool[vertices.Count, vertices.Count];
+            this.repVertex = new Dictionary<T, int>();
+            this.adjacencyMatrix = new int[vertices.Count(), vertices.Count()];
             int i = 0;
-            foreach (Course item in vertices)
+            foreach (T item in vertices)
             {
                 this.repVertex.Add(item,i++);
             }
         }
 
-        public void SetEdge(Course v, Course v1)
+        public void SetEdge(T v, T v1)
         {
-            this.adjacencyMatrix[repVertex[v], repVertex[v1]] = true;
+            this.adjacencyMatrix[repVertex[v], repVertex[v1]] = 1;
         }
-        public void RemoveEdge(Course v, Course v1)
+        public void SetEdge(T v, T v1, int cost)
         {
-            this.adjacencyMatrix[repVertex[v], repVertex[v1]] = false;
+            this.adjacencyMatrix[repVertex[v], repVertex[v1]] = cost;
+        }
+        public bool CheckEdge(T v, T v1)
+        {
+            return this.adjacencyMatrix[repVertex[v], repVertex[v1]] > 0 ? true : false;
+        }
+        public void RemoveEdge(T v, T v1)
+        {
+            this.adjacencyMatrix[repVertex[v], repVertex[v1]] = 0;
+        }
+        private bool CheckEdge(int i, int j)
+        {
+            return this.adjacencyMatrix[i, j] > 0 ? true : false;
         }
 
         private int[] SortVertex()
@@ -39,21 +51,24 @@ namespace SchedulingSystem
                 numberOfEdges.Add(i, 0);
                 for(int j = 0; j < adjacencyMatrix.GetLength(1); j++)
                 {
-                    numberOfEdges[i] += (adjacencyMatrix[i, j]) ? 1 : 0;
+                    numberOfEdges[i] += CheckEdge(i,j) ? 1 : 0;
                 }
             }
             var sorted = from entry in numberOfEdges orderby entry.Value descending select entry.Key;
             return sorted.ToArray();
         }
         /// <summary>
-        /// A method that colors the graph
+        /// A method that colours the graph
         /// </summary>
-        public Dictionary<Course,List<Course>> ColorGraph()
+        /// <param name="test">a predicate used to test each of the hashset the method returns</param>
+        /// <returns></returns>
+        public List<HashSet<T>> ColorGraph(Predicate<int> test)
         {
-            var map = new Dictionary<Course, List<Course>>();
+            var map = new List<HashSet<T>>();
             var sortedIndex = SortVertex();
-            byte[] isColored = new byte[sortedIndex.Length];
-            byte colors = 0;
+           
+            int[] isColored = new int[sortedIndex.Length];
+            int colors = 0;
             int noOfVertex;
             for (int i = 0; i < sortedIndex.Length; i++)
             {
@@ -61,17 +76,17 @@ namespace SchedulingSystem
                 if (isColored[i] != 0)
                     continue;
                 isColored[i] = ++colors;
-                Course present = repVertex.First(x => x.Value == sortedIndex[i]).Key as Course;
-                map.Add(present , new List<Course>());
+                T present = repVertex.First(x => x.Value == sortedIndex[i]).Key;
+                map.Add(new HashSet<T> { present });
                 for (int j = i + 1; j < sortedIndex.Length; j++)
                 {
-                    Course courseToBeAdded = repVertex.First(x => x.Value == sortedIndex[j]).Key as Course;
-                    if (!adjacencyMatrix[i, j] && isColored[j] == 0 && Validate(map[present], courseToBeAdded));
+                    T courseToBeAdded = repVertex.First(x => x.Value == sortedIndex[j]).Key;
+                    if (!CheckEdge(i,j) && isColored[j] == 0)
                     {
-                        if (noOfVertex == Venue.NumberOfVenues)
+                        if (!test(noOfVertex))
                             break;
                         isColored[j] = colors;
-                        map[present].Add(courseToBeAdded);
+                        map[map.Count-1].Add(courseToBeAdded);
                         noOfVertex++;
                     }
                         
@@ -80,18 +95,18 @@ namespace SchedulingSystem
             }
             return map;
         }
-        public bool Validate(List<Course> courses, Course course)
-        {
-            //TODO add Student
-            foreach (var item in courses)
-            {
-                if(item.Lecturers.Intersect(course.Lecturers).Count() != 0)
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
+        //public bool Validate(List<Course> courses, Course course)
+        //{
+        //    //TODO add Student
+        //    foreach (var item in courses)
+        //    {
+        //        if(item.Lecturers.Intersect(course.Lecturers).Count() != 0)
+        //        {
+        //            return false;
+        //        }
+        //    }
+        //    return true;
+        //}
         
     }
 }
