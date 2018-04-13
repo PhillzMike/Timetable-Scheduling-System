@@ -136,6 +136,9 @@ namespace SchedulingSystem {
         }
         List<HashSet<int>> CombinC;
         void CombinCode(int tot,int count,HashSet<int> prev) {
+            //Why do I think this guy will still not work
+            //when i = tot-1,prev would contain 0 and tot-1 and count might be greater than  2
+            //You get??
             for(int i = 0; i < tot; i++) {
                 if (!prev.Contains(i)) {
                     prev.Add(i);

@@ -34,12 +34,13 @@ namespace SchedulingSystem
             /// <param name="level">the level the course is studied</param>
             /// <param name="lecturers">the lecturers taking the course</param>
             public Course(string code, bool isLab, int weeklyHours, int level , DateTime startTimeFrame, DateTime endTimeFrame, List<string> validDays)
-        {
+            {
             this.code = code;
             this.isLab = isLab;
             this.weeklyHours = weeklyHours;
             this.startTimeFrame = startTimeFrame;
             this.endTimeFrame = endTimeFrame;
+            HasSpecialTime = (startTimeFrame.Equals(GlobalStart) && endTimeFrame.Equals(GlobalEnd)) ? false : true;
             this.level = level;
             this.lecturers = new HashSet<Lecturer>();
             this.students = new HashSet<Student>();
