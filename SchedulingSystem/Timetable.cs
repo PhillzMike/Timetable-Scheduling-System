@@ -8,8 +8,11 @@ namespace SchedulingSystem {
     //3dO
     public class Timetable {
         Graph<Course> icarly;
+        HashSet<Venue> allVenues;
         public Timetable(string toExcel, Tuple<DateTime, DateTime> DailyTime) {
+            allVenues = new HashSet<Venue>();
             Input ngine = new Input(toExcel, DailyTime);
+            allVenues.UnionWith(ngine.AllVenues);
             HashSet<Course> AllCourses = new HashSet<Course>(ngine.AllCourses.Values);
              icarly = new Graph<Course>(ngine.AllCourses.Values);
             foreach(Course c1 in AllCourses) {
@@ -38,8 +41,33 @@ namespace SchedulingSystem {
             Random r = new Random();
 
         }
-        List<HashSet<Course>> UtilizeSpace(HashSet<Course> hc) {
-            throw new NotImplementedException();
+        List<Dictionary<Course,Venue>> UtilizeSpace(HashSet<Course> hc) {
+            List<Course> courses = new List<Course>(hc);
+            List<Venue> venues = new List<Venue>(allVenues);
+            venues.Sort();
+
+            var map = new List<Dictionary<Course,Venue>>();
+            
+            for(int i=0;i<courses.Count;i++)
+            {
+                map.Add(new Dictionary<Course, Venue>());
+                for (int j = i + 1; j < courses.Count; j++)
+                {
+                    if (courses[j].Students.Count > venues[0].GetCapacity)
+                        continue;
+                    var tempVenue = venues[0];
+                    for (int k = 1; i < venues.Count; i++)
+                    {
+                        if (courses[j].Students.Count > venues[i].GetCapacity)
+                            break;
+                        tempVenue = venues[i];
+                    }
+                    venues.Remove(tempVenue);
+                }
+                
+
+            }
+            
         }
         
     }
