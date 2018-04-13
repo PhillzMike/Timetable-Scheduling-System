@@ -10,12 +10,13 @@ namespace SchedulingSystem {
         private string VenueName;
         private int VenueCapacity;
         private bool _isLab;
+        private static int noOfVenues;
 
         public Venue( String Name, int Capacity, bool Lab ){
-        this.VenueName = Name;
-        this.VenueCapacity = Capacity;
-        this._isLab = Lab;
-        
+            this.VenueName = Name;
+            this.VenueCapacity = Capacity;
+            this._isLab = Lab;
+            noOfVenues++;
         
 }    
         public string GetName {get {  return this.VenueName;}}
@@ -24,6 +25,10 @@ namespace SchedulingSystem {
 
          public bool IsLab {get {return this._isLab;}}
 
+        public static int NoOfVenues
+        {
+            get => noOfVenues;
+        }
         
 
     }
