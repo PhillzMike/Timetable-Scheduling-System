@@ -95,6 +95,22 @@ namespace SchedulingSystem
             }
             return map;
         }
+        public List<HashSet<T>> OurColorGraph()
+        {
+            var map = new List<HashSet<T>>();
+            for(int i = 0; i < adjacencyMatrix.GetLength(0); i++)
+            {
+                map.Add(new HashSet<T>());
+                for(int j= 0; j < adjacencyMatrix.GetLength(1); j++)
+                {
+                    if (!CheckEdge(i, j)){
+                        T courseToBeAdded = repVertex.First(x => x.Value == j).Key;
+                        map[map.Count - 1].Add(courseToBeAdded);
+                    }
+                }
+            }
+            return map;
+        }
         //public bool Validate(List<Course> courses, Course course)
         //{
         //    //TODO add Student
