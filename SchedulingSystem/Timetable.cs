@@ -6,17 +6,18 @@ using System.Threading.Tasks;
 
 namespace SchedulingSystem {
     //3dO
-    public class Timetable {
+    public partial class Timetable {
         Graph<Course> icarly;
         HashSet<Course> AllCourses;
         HashSet<string> DoW;
         int LoP;
         int NoP;
+        HashSet<Venue> allVenues;
         public Timetable(string toExcel, Tuple<DateTime, DateTime> DailyTime,int LengthOfPeriod, HashSet<string> DaysOfWeek ) {
-            //HashSet<Venue> allVenues;
+            //
             //public Timetable(string toExcel, Tuple<DateTime, DateTime> DailyTime)
             //{
-            //    allVenues = new HashSet<Venue>();
+                allVenues = new HashSet<Venue>();
                 this.DoW = DaysOfWeek;
             this.LoP = LengthOfPeriod;
             this.NoP = DailyTime.Item2.Hour - DailyTime.Item1.Hour;
@@ -45,7 +46,7 @@ namespace SchedulingSystem {
         void ClusterTogether(){
             List<HashSet<Course>> init = icarly.ColorGraph();
             foreach(HashSet<Course> hc in init) {
-                CanBeTogether.AddRange(UtilizeSpace(hc));
+              //  CanBeTogether.AddRange(UtilizeSpace(hc));
             }
             
         }
@@ -84,35 +85,7 @@ namespace SchedulingSystem {
         List<HashSet<int>> Combin(int tot,int count) {
             throw new NotImplementedException();
         }
-        List<Dictionary<Course,Venue>> UtilizeSpace(HashSet<Course> hc) {
-            List<Course> courses = new List<Course>(hc);
-            List<Venue> venues = new List<Venue>(allVenues);
-            venues.Sort();
-
-            var map = new List<Dictionary<Course,Venue>>();
-            
-            for(int i=0;i<courses.Count;i++)
-            {
-                map.Add(new Dictionary<Course, Venue>());
-                for (int j = i + 1; j < courses.Count; j++)
-                {
-                    if (courses[j].Students.Count > venues[0].GetCapacity)
-                        continue;
-                    var tempVenue = venues[0];
-                    for (int k = 1; i < venues.Count; i++)
-                    {
-                        if (courses[j].Students.Count > venues[i].GetCapacity)
-                            break;
-                        tempVenue = venues[i];
-                    }
-                    venues.Remove(tempVenue);
-                }
-                
-
-            }
-            
-        }
-        
+    
     }
 
 }
