@@ -7,37 +7,28 @@ using System.Threading.Tasks;
 namespace SchedulingSystem
 {
     //Timi
-    public class Graph<T>
+    public class Graph
     {
-        private Dictionary<T, int> repVertex;
-        private int[,] adjacencyMatrix;
-        public Graph(List<T> vertices)
+        private Dictionary<Course, int> repVertex;
+        private bool[,] adjacencyMatrix;
+        public Graph(List<Course> vertices)
         {
-            this.repVertex = new Dictionary<T, int>();
-            this.adjacencyMatrix = new int[vertices.Count, vertices.Count];
+            this.repVertex = new Dictionary<Course, int>();
+            this.adjacencyMatrix = new bool[vertices.Count, vertices.Count];
             int i = 0;
-            foreach (T item in vertices)
+            foreach (Course item in vertices)
             {
                 this.repVertex.Add(item,i++);
             }
         }
 
-        public void SetEdge(T v, T v1)
+        public void SetEdge(Course v, Course v1)
         {
-            this.adjacencyMatrix[repVertex[v], repVertex[v1]] = 1;
+            this.adjacencyMatrix[repVertex[v], repVertex[v1]] = true;
         }
-        public void RemoveEdge(T v, T v1)
+        public void RemoveEdge(Course v, Course v1)
         {
-            this.adjacencyMatrix[repVertex[v], repVertex[v1]] = 0;
-        }
-        public void SetEdge(T v, T v1, int cost)
-        {
-            this.adjacencyMatrix[repVertex[v], repVertex[v1]] = cost;
-        }
-
-        public int GetEdgeCount(T v, T v1)
-        {
-            return this.adjacencyMatrix[repVertex[v], repVertex[v1]];
+            this.adjacencyMatrix[repVertex[v], repVertex[v1]] = false;
         }
 
         private int[] SortVertex()
@@ -48,18 +39,16 @@ namespace SchedulingSystem
                 numberOfEdges.Add(i, 0);
                 for(int j = 0; j < adjacencyMatrix.GetLength(1); j++)
                 {
-                    numberOfEdges[i] += (adjacencyMatrix[i, j] > 0) ? 1 : 0;
+                    numberOfEdges[i] += (adjacencyMatrix[i, j]) ? 1 : 0;
                 }
             }
-            var sorted = new SortedDictionary<int,int>(numberOfEdges);
-            return sorted.Keys.ToArray();
+            var sorted = from entry in numberOfEdges orderby entry.Value descending select entry.Key;
+            return sorted.ToArray();
         }
-        //TODO: Check this delegate
         /// <summary>
         /// A method that colors the graph
         /// </summary>
-        /// <param name="test">a condition the vertices having the same color is tested with</param>
-        public Dictionary<Course,List<Course>> ColorGraph(Predicate<int> test)
+        public Dictionary<Course,List<Course>> ColorGraph()
         {
             var map = new Dictionary<Course, List<Course>>();
             var sortedIndex = SortVertex();
@@ -77,12 +66,13 @@ namespace SchedulingSystem
                 for (int j = i + 1; j < sortedIndex.Length; j++)
                 {
                     Course courseToBeAdded = repVertex.First(x => x.Value == sortedIndex[j]).Key as Course;
-                    if (adjacencyMatrix[i, j] == 0 && isColored[j] == 0 && Validate(map[present], courseToBeAdded));
+                    if (!adjacencyMatrix[i, j] && isColored[j] == 0 && Validate(map[present], courseToBeAdded));
                     {
-                        if (!test(noOfVertex))
+                        if (noOfVertex == Venue.NumberOfVenues)
                             break;
                         isColored[j] = colors;
                         map[present].Add(courseToBeAdded);
+                        noOfVertex++;
                     }
                         
                 }
