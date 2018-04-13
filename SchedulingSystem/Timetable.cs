@@ -8,12 +8,24 @@ namespace SchedulingSystem {
     //3dO
     public class Timetable {
         Graph<Course> icarly;
-        HashSet<Venue> allVenues;
-        public Timetable(string toExcel, Tuple<DateTime, DateTime> DailyTime) {
-            allVenues = new HashSet<Venue>();
+        HashSet<Course> AllCourses;
+        HashSet<string> DoW;
+        int LoP;
+        int NoP;
+        public Timetable(string toExcel, Tuple<DateTime, DateTime> DailyTime,int LengthOfPeriod, HashSet<string> DaysOfWeek ) {
+            //HashSet<Venue> allVenues;
+            //public Timetable(string toExcel, Tuple<DateTime, DateTime> DailyTime)
+            //{
+            //    allVenues = new HashSet<Venue>();
+                this.DoW = DaysOfWeek;
+            this.LoP = LengthOfPeriod;
+            this.NoP = DailyTime.Item2.Hour - DailyTime.Item1.Hour;
+            if(DailyTime.Item1.Minute> DailyTime.Item2.Minute) {
+                NoP -= 1;
+            }
             Input ngine = new Input(toExcel, DailyTime);
             allVenues.UnionWith(ngine.AllVenues);
-            HashSet<Course> AllCourses = new HashSet<Course>(ngine.AllCourses.Values);
+            AllCourses = new HashSet<Course>(ngine.AllCourses.Values);
              icarly = new Graph<Course>(ngine.AllCourses.Values);
             foreach(Course c1 in AllCourses) {
                 foreach(Course c2 in AllCourses) {
@@ -35,11 +47,42 @@ namespace SchedulingSystem {
             foreach(HashSet<Course> hc in init) {
                 CanBeTogether.AddRange(UtilizeSpace(hc));
             }
+            
         }
-        void Separate(List<HashSet<HashSet<Course>>> TT) {
-            List<HashSet<HashSet<Course>>> Sep = new List<HashSet<HashSet<Course>>>();
-            Random r = new Random();
+        void Diffy() {
+            Diff_days = new Graph<HashSet<Course>>(CanBeTogether);
+            foreach(HashSet<Course> hc in CanBeTogether) {
+                foreach (HashSet<Course> hc2 in CanBeTogether) {
+                    if (hc.Intersect(hc2).Count() > 0) {
+                        Diff_days.SetEdge(hc, hc2);
+                    }
+                }
+            }
+            GetBest(Diff_days.ColorGraph(NoP));
+        }
+        Dictionary<HashSet<int>,int> ScoreCombs;
+        void GetBest(List<HashSet<HashSet<Course>>> TT) {
+            foreach(HashSet<int> comb in Combin(TT.Count, DoW.Count)) {
+                List<HashSet<HashSet<Course>>> Sep = new List<HashSet<HashSet<Course>>>();
+                foreach (int n in comb) {
+                    Sep.Add(TT[n]);
+                }
+                ScoreCombs.Add(comb,Score(Sep));
+            }
+            //Assume all courses are 1 hour long
+            
 
+
+        }
+
+        void Separate(List<HashSet<HashSet<Course>>> TimeT) {
+            List<List<HashSet<Course>>> FinalTT = new List<List<HashSet<Course>>>();
+        }
+        int Score(List<HashSet<HashSet<Course>>> TimeT) {
+            throw new NotImplementedException();
+        }
+        List<HashSet<int>> Combin(int tot,int count) {
+            throw new NotImplementedException();
         }
         List<Dictionary<Course,Venue>> UtilizeSpace(HashSet<Course> hc) {
             List<Course> courses = new List<Course>(hc);

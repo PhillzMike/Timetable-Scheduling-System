@@ -125,7 +125,6 @@ namespace SchedulingSystem
                     vD = sp.Cells[i, 7];
                     nvD = vD.Split(',').ToList();
                 }
-                //TODO fix
                 if(wCH + wLH > 0) {
                     Course courseinfo;
                     if (wCH > 0) {
