@@ -63,7 +63,7 @@ namespace SchedulingSystem
                         }
                     }
                     //create a Student objets and adds it to the list of Students
-                    studentList.Add(new Student(name, level, coursesOffered));
+                    studentList.Add(new Student(name, coursesOffered, level));
                   
                 }
                 else
