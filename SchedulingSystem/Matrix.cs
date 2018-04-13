@@ -60,9 +60,10 @@ namespace SchedulingSystem
         /// <summary>
         /// A method that colours the graph
         /// </summary>
-        /// <param name="test">a predicate used to test each of the hashset the method returns</param>
+        /// <param name="UpperLimit">The upper limit of each hashset Generated. If no limit, put 0</param>
         /// <returns></returns>
-        public List<HashSet<T>> ColorGraph(Predicate<int> test)
+        /// Th
+        public List<HashSet<T>> ColorGraph(int UpperLimit)
         {
             var map = new List<HashSet<T>>();
             var sortedIndex = SortVertex();
@@ -83,7 +84,7 @@ namespace SchedulingSystem
                     T courseToBeAdded = repVertex.First(x => x.Value == sortedIndex[j]).Key;
                     if (!CheckEdge(i,j) && isColored[j] == 0)
                     {
-                        if (!test(noOfVertex))
+                        if (UpperLimit!=0&&noOfVertex>=UpperLimit)
                             break;
                         isColored[j] = colors;
                         map[map.Count-1].Add(courseToBeAdded);
@@ -95,18 +96,21 @@ namespace SchedulingSystem
             }
             return map;
         }
-        //public bool Validate(List<Course> courses, Course course)
-        //{
-        //    //TODO add Student
-        //    foreach (var item in courses)
-        //    {
-        //        if(item.Lecturers.Intersect(course.Lecturers).Count() != 0)
-        //        {
-        //            return false;
-        //        }
-        //    }
-        //    return true;
-        //}
-        
-    }
+        public List<HashSet<T>> ColorGraph() {
+            return ColorGraph(0);
+        }
+            //public bool Validate(List<Course> courses, Course course)
+            //{
+            //    //TODO add Student
+            //    foreach (var item in courses)
+            //    {
+            //        if(item.Lecturers.Intersect(course.Lecturers).Count() != 0)
+            //        {
+            //            return false;
+            //        }
+            //    }
+            //    return true;
+            //}
+
+        }
 }

@@ -58,7 +58,11 @@ namespace SchedulingSystem
                             if (AllCourses.ContainsKey(sp.Cells[i, j].Value2))
                             {
                                 coursesOffered.Add(AllCourses[sp.Cells[i, j].Value2]);
-                                
+                                if (AllCourses.ContainsKey(sp.Cells[i, j].Value2 + "l(4)b")) {
+                                    coursesOffered.Add(AllCourses[sp.Cells[i, j].Value2 + "l(4)b"]);
+                                }
+                            } else if (AllCourses.ContainsKey(sp.Cells[i, j].Value2 + "l(4)b")) {
+                                coursesOffered.Add(AllCourses[sp.Cells[i, j].Value2 + "l(4)b"]);
                             }
                             else
                             {
@@ -84,18 +88,21 @@ namespace SchedulingSystem
          
             for (int i = 5; i <= sp.Rows.Count; i++)
             {
-                if (string.IsNullOrWhiteSpace(sp.Cells[i, 1].Value2 +"") || string.IsNullOrWhiteSpace(sp.Cells[i, 2].Value2 + "")
-                    || string.IsNullOrWhiteSpace(sp.Cells[i, 3].Value2 + ""))
+                if (string.IsNullOrWhiteSpace(sp.Cells[i, 1].Value2 +"") || string.IsNullOrWhiteSpace(sp.Cells[i, 2].Value2 + ""))
                     continue;
 
                    string code = sp.Cells[i, 1];
                    int level = (int)sp.Cells[i, 2];
-                   int wCH = (int)sp.Cells[i, 3];
+                int wCH; 
                 int wLH;
                 DateTime sTF;
                 DateTime eTF;
                 string vD;
                 List<String> nvD;
+                if (string.IsNullOrWhiteSpace(sp.Cells[i, 3].Value2 + ""))
+                    wCH = 0;
+                else
+                    wCH = (int)sp.Cells[i, 3];
                 if (string.IsNullOrWhiteSpace(sp.Cells[i, 4].Value2 + ""))
                     wLH = 0;
                 else
@@ -118,12 +125,27 @@ namespace SchedulingSystem
                     vD = sp.Cells[i, 7];
                     nvD = vD.Split(',').ToList();
                 }
-
-                Course courseinfo = new Course(code, wCH, wLH, level, sTF, eTF, nvD);
-                if (AllCourses.ContainsKey(code))
-                    Error("Course code aready exist and so was skipped");
-                else
-                  AllCourses.Add(code, courseinfo);
+                //TODO fix
+                if(wCH + wLH > 0) {
+                    Course courseinfo;
+                    if (wCH > 0) {
+                        courseinfo = new Course(code, false, wCH, level, sTF, eTF, nvD);
+                        if (AllCourses.ContainsKey(code))
+                            Error("Course code aready exist and so was skipped");
+                        else
+                            AllCourses.Add(code, courseinfo);
+                    }
+                    if (wLH > 0) {
+                        courseinfo = new Course(code, true, wLH, level, sTF, eTF, nvD);
+                        if (AllCourses.ContainsKey(code+"l(4)b"))
+                            Error("Course code aready exist and so was skipped"+code);
+                        else
+                            AllCourses.Add(code + "l(4)b", courseinfo);
+                    }
+                    
+                }
+                 
+               
             }
             
         }
@@ -144,7 +166,12 @@ namespace SchedulingSystem
                         {      //checks the if the courses in all the list of courses 
                             if (AllCourses.ContainsKey(sp.Cells[i, j].Value2))
                             {
-                                LecturerCourses.Add(sp.Cells[i, j].Value2);
+                                LecturerCourses.Add(AllCourses[sp.Cells[i, j].Value2]);
+                                if (AllCourses.ContainsKey(sp.Cells[i, j].Value2 + "l(4)b")) {
+                                    LecturerCourses.Add(AllCourses[sp.Cells[i, j].Value2 + "l(4)b"]);
+                                }
+                            } else if (AllCourses.ContainsKey(sp.Cells[i, j].Value2 + "l(4)b")) {
+                                LecturerCourses.Add(AllCourses[sp.Cells[i, j].Value2 + "l(4)b"]);
                             }
                             else
                             {

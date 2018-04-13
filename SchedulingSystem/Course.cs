@@ -9,8 +9,8 @@ namespace SchedulingSystem
    public class Course
     {
         private string code;
-        private int weeklyClassHours;
-        private int weeklyLabHours;
+        private bool isLab;
+        private int weeklyHours;
         private int level;
         private HashSet<Lecturer> lecturers;
         private HashSet<Student> students;
@@ -30,11 +30,11 @@ namespace SchedulingSystem
         /// <param name="validDays">the days the course is valid for</param>
         /// <param name="level">the level the course is studied</param>
         /// <param name="lecturers">the lecturers taking the course</param>
-        public Course(string code, int weeklyClassHours, int weeklyLabHours, int level , DateTime startTimeFrame, DateTime endTimeFrame, List<string> validDays)
+        public Course(string code, bool isLab, int weeklyHours, int level , DateTime startTimeFrame, DateTime endTimeFrame, List<string> validDays)
         {
             this.code = code;
-            this.weeklyClassHours = weeklyClassHours;
-            this.weeklyLabHours = weeklyLabHours;
+            this.isLab = isLab;
+            this.weeklyHours = weeklyHours;
             this.startTimeFrame = startTimeFrame;
             this.endTimeFrame = endTimeFrame;
             this.level = level;
@@ -48,8 +48,8 @@ namespace SchedulingSystem
         }
 
         public string Code { get => code; }
-        public int WeeklyClassHours { get => weeklyClassHours;  }
-        public int WeeklyLabHours { get => weeklyLabHours; }
+        public bool IsLab { get => isLab;  }
+        public int WeeklyHours { get => weeklyHours;  }
         public DateTime StartTimeFrame { get => startTimeFrame; }
         public DateTime EndTimeFrame { get => endTimeFrame; }
         public List<string> ValidDays { get => new List<string>(validDays); }

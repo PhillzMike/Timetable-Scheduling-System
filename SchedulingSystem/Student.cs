@@ -27,7 +27,7 @@ namespace SchedulingSystem
         {
             return level;
         }
-        public List<Course> getCoursesRegistered()
+        public List<Course> Courses()
         {
             return coursesRegistered;
         }
