@@ -39,14 +39,11 @@ namespace SchedulingSystem
             this.endTimeFrame = endTimeFrame;
             this.level = level;
             this.lecturers = new HashSet<Lecturer>();
+            this.students = new HashSet<Student>();
             this.validDays = new List<string>();
             foreach (var day in validDays)
             {
                 this.validDays.Add(day);
-            }
-            foreach (var lecturer in lecturers)
-            {
-                this.lecturers.Add(lecturer);
             }
         }
 
@@ -57,8 +54,8 @@ namespace SchedulingSystem
         public DateTime EndTimeFrame { get => endTimeFrame; }
         public List<string> ValidDays { get => new List<string>(validDays); }
         public int Level { get => level;}
-        public HashSet<Lecturer> Lecturers { get => new HashSet<Lecturer>(lecturers);}
-        public HashSet<Student> Students { get => new HashSet<Student>(students); }
+        public HashSet<Lecturer> Lecturers { get => lecturers; }
+        public HashSet<Student> Students { get => students; }
 
     }
 }
