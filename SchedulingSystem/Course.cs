@@ -12,7 +12,7 @@ namespace SchedulingSystem
         private int weeklyClassHours;
         private int weeklyLabHours;
         private int level;
-        private List<Lecturer> lecturers;
+        private HashSet<Lecturer> lecturers;
         private DateTime startTimeFrame;
         private DateTime endTimeFrame;
         private List<string> validDays;
@@ -20,8 +20,8 @@ namespace SchedulingSystem
      //   public Course(string code, int weeklyClassHours, int weeklyLabHours, int level)
    //     :this(code,weeklyClassHours,weeklyLabHours, level, 0,0,new List <string> { "Monday", "Tuesday" }){
 //}
-        public Course(string code, int weeklyClassHours, int weeklyLabHours, int level, DateTime startTimeFrame, DateTime endTimeFrame) 
-            : this(code, weeklyClassHours, weeklyLabHours, level, startTimeFrame, endTimeFrame, new List<string> { "Monday", "Tuesday" } )
+        public Course(string code, int weeklyClassHours, int weeklyLabHours, int level, DateTime startTimeFrame, DateTime endTimeFrame, HashSet<Lecturer> lecturers) 
+            : this(code, weeklyClassHours, weeklyLabHours, level, startTimeFrame, endTimeFrame, new List<string> { "Monday", "Tuesday" },lecturers )
         {
         }
 
@@ -36,7 +36,7 @@ namespace SchedulingSystem
         /// <param name="validDays">the days the course is valid for</param>
         /// <param name="level">the level the course is studied</param>
         /// <param name="lecturers">the lecturers taking the course</param>
-        public Course(string code, int weeklyClassHours, int weeklyLabHours, int level , DateTime startTimeFrame, DateTime endTimeFrame, List<string> validDays)
+        public Course(string code, int weeklyClassHours, int weeklyLabHours, int level , DateTime startTimeFrame, DateTime endTimeFrame, List<string> validDays, HashSet<Lecturer> lecturers)
         {
             this.code = code;
             this.weeklyClassHours = weeklyClassHours;
@@ -44,7 +44,7 @@ namespace SchedulingSystem
             this.startTimeFrame = startTimeFrame;
             this.endTimeFrame = endTimeFrame;
             this.level = level;
-            this.lecturers = new List<Lecturer>();
+            this.lecturers = new HashSet<Lecturer>();
             this.validDays = new List<string>();
             foreach (var day in validDays)
             {
@@ -59,11 +59,11 @@ namespace SchedulingSystem
         public string Code { get => code; }
         public int WeeklyClassHours { get => weeklyClassHours;  }
         public int WeeklyLabHours { get => weeklyLabHours; }
-        public int StartTimeFrame { get => startTimeFrame; }
-        public int EndTimeFrame { get => endTimeFrame; }
+        public DateTime StartTimeFrame { get => startTimeFrame; }
+        public DateTime EndTimeFrame { get => endTimeFrame; }
         public List<string> ValidDays { get => new List<string>(validDays); }
         public int Level { get => level;}
-        public List<Lecturer> Lecturers { get => new List<Lecturer>(lecturers);}
+        public HashSet<Lecturer> Lecturers { get => new HashSet<Lecturer>(lecturers);}
 
     }
 }

@@ -9,10 +9,28 @@ namespace SchedulingSystem
     //Peace
     public class Student
     {
-
-        public Student(String name, int level, List<Course> courses)
+        private String name;
+        private int level;
+        private List<Course> coursesRegistered;
+        public Student(String name, List<Course> coursesRegistered, int level)
         {
-
+            this.name = name;
+            this.coursesRegistered = coursesRegistered;
+            this.level = level;
         }
+
+        public String getName()
+        {
+            return name;
+        }
+        public int getLevel()
+        {
+            return level;
+        }
+        public List<Course> getCoursesRegistered()
+        {
+            return coursesRegistered;
+        }
+        
     }
 }

@@ -30,10 +30,10 @@ namespace SchedulingSystem
         {
             this.adjacencyMatrix[repVertex[v], repVertex[v1]] = 0;
         }
-        //public void SetEdge(T v, T v1, int cost)
-        //{
-        //    this.adjacencyMatrix[repVertex[v], repVertex[v1]] = cost;
-        //}
+        public void SetEdge(T v, T v1, int cost)
+        {
+            this.adjacencyMatrix[repVertex[v], repVertex[v1]] = cost;
+        }
 
         public int GetEdgeCount(T v, T v1)
         {
@@ -42,26 +42,26 @@ namespace SchedulingSystem
 
         private int[] SortVertex()
         {
-            var numberOfEdges = new int[adjacencyMatrix.GetLength(0)];
+            var numberOfEdges = new Dictionary<int, int>();
             for(int i = 0; i < adjacencyMatrix.GetLength(0); i++)
             {
+                numberOfEdges.Add(i, 0);
                 for(int j = 0; j < adjacencyMatrix.GetLength(1); j++)
                 {
-                    //TODO change this guy to allow cost
-                    numberOfEdges[i] += adjacencyMatrix[i, j];
+                    numberOfEdges[i] += (adjacencyMatrix[i, j] > 0) ? 1 : 0;
                 }
             }
-            Array.Sort(numberOfEdges);
-            return numberOfEdges;
+            var sorted = new SortedDictionary<int,int>(numberOfEdges);
+            return sorted.Keys.ToArray();
         }
         //TODO: Check this delegate
         /// <summary>
         /// A method that colors the graph
         /// </summary>
         /// <param name="test">a condition the vertices having the same color is tested with</param>
-        public Dictionary<T,List<T>> ColorGraph(Predicate<int> test)
+        public Dictionary<Course,List<Course>> ColorGraph(Predicate<int> test)
         {
-            var map = new Dictionary<T, List<T>>();
+            var map = new Dictionary<Course, List<Course>>();
             var sortedIndex = SortVertex();
             byte[] isColored = new byte[sortedIndex.Length];
             byte colors = 0;
@@ -72,16 +72,17 @@ namespace SchedulingSystem
                 if (isColored[i] != 0)
                     continue;
                 isColored[i] = ++colors;
-                T present = repVertex.First(x => x.Value == sortedIndex[i]).Key;
-                map.Add(present , new List<T>());
+                Course present = repVertex.First(x => x.Value == sortedIndex[i]).Key as Course;
+                map.Add(present , new List<Course>());
                 for (int j = i + 1; j < sortedIndex.Length; j++)
                 {
-                    if(adjacencyMatrix[i,j] == 0 && isColored[j] == 0)
+                    Course courseToBeAdded = repVertex.First(x => x.Value == sortedIndex[j]).Key as Course;
+                    if (adjacencyMatrix[i, j] == 0 && isColored[j] == 0 && Validate(map[present], courseToBeAdded));
                     {
                         if (!test(noOfVertex))
                             break;
                         isColored[j] = colors;
-                        map[present].Add(repVertex.First(x => x.Value == sortedIndex[j]).Key);
+                        map[present].Add(courseToBeAdded);
                     }
                         
                 }
@@ -89,5 +90,18 @@ namespace SchedulingSystem
             }
             return map;
         }
+        public bool Validate(List<Course> courses, Course course)
+        {
+            //TODO add Student
+            foreach (var item in courses)
+            {
+                if(item.Lecturers.Intersect(course.Lecturers).Count() != 0)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+        
     }
 }
