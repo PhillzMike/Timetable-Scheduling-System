@@ -19,17 +19,17 @@ namespace SchedulingSystem
             this.level = level;
         }
 
-        public String getName()
+        public String GetName
         {
-            return name;
+            get => name;
         }
-        public int getLevel()
+        public int GetLevel
         {
-            return level;
+            get => level;
         }
-        public List<Course> Courses()
+        public List<Course> Courses
         {
-            return coursesRegistered;
+             get => coursesRegistered;
         }
         
     }
