@@ -93,9 +93,9 @@ namespace SchedulingSystem {
             Random r = new Random();
             foreach (HashSet<HashSet<Course>> DayPeriods in TimeT) {
                 List < List < Course > > Periods = new List<List<Course>>();
-                foreach (HashSet<Course> SinglePeriod in DayPeriods) {
+                foreach (HashSet<Course> SinglePeriod in DayPeriods){
                     List<Course> thisPeriod = new List<Course>();
-                    foreach (Course c in SinglePeriod) {
+                    foreach (Course c in SinglePeriod){
                         if (r.Next(10) < (((double)HoursLeft[c].Item1 / (double)HoursLeft[c].Item2) * 10)) {
                             thisPeriod.Add(c);
                             HoursLeft[c] = new Tuple<int, int>(HoursLeft[c].Item1 - 1, HoursLeft[c].Item2 - 1);
