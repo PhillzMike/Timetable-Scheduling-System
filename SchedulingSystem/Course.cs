@@ -21,8 +21,10 @@ namespace SchedulingSystem
         public static DateTime GlobalStart;
         public static DateTime GlobalEnd;
         public static List<string> GlobalDays;
-        //TODO return true is Start time and end time differ from global start and end
-        public bool HasSpecialTime;
+        public bool HasSpecialTime
+        {
+            get => (startTimeFrame.Equals(GlobalStart) && endTimeFrame.Equals(GlobalEnd)) ? false : true;
+        }
             /// <summary>
             /// 
             /// </summary>
@@ -34,14 +36,13 @@ namespace SchedulingSystem
             /// <param name="validDays">the days the course is valid for</param>
             /// <param name="level">the level the course is studied</param>
             /// <param name="lecturers">the lecturers taking the course</param>
-            public Course(string code, bool isLab, int weeklyHours, int level , DateTime startTimeFrame, DateTime endTimeFrame, List<string> validDays)
+        public Course(string code, bool isLab, int weeklyHours, int level , DateTime startTimeFrame, DateTime endTimeFrame, List<string> validDays)
             {
             this.code = code;
             this.isLab = isLab;
             this.weeklyHours = weeklyHours;
             this.startTimeFrame = startTimeFrame;
             this.endTimeFrame = endTimeFrame;
-            HasSpecialTime = (startTimeFrame.Equals(GlobalStart) && endTimeFrame.Equals(GlobalEnd)) ? false : true;
             this.level = level;
             this.lecturers = new HashSet<Lecturer>();
             this.students = new HashSet<Student>();

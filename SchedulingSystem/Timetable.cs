@@ -75,8 +75,7 @@ namespace SchedulingSystem {
                     }
                 }
                 List<Dictionary<Course, Venue>> CanBeTogether = new List<Dictionary<Course, Venue>>();
-                //TODO Make Delegate
-                Delegate h = null;
+                Func<Course,HashSet<Course>,bool> h = CanAdd;
                 List<HashSet<Course>> init = GraphOfDay[Day].ColorGraph(h,NoP);
                 foreach (HashSet<Course> hc in init) {
                     foreach(Course c in hc) {
@@ -88,7 +87,6 @@ namespace SchedulingSystem {
             }
             return  GenerateVenues(TTv1);
         }
-        //TODO Delegate function
         bool CanAdd(Course c, HashSet<Course> hc) {
             hc = new HashSet<Course>(hc);
             if (hc.Contains(c))
