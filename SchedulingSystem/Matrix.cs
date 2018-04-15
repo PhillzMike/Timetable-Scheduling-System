@@ -55,7 +55,7 @@ namespace SchedulingSystem {
         /// </summary>
         /// <param name="UpperLimit">The upper limit of each hashset Generated. If no limit, put 0</param>
         /// <returns></returns>
-        //TODO takes in a delegate to ensure you and add
+        //TODO takes in a delegate to ensure you can add
         public List<HashSet<T>> ColorGraph(Delegate CanAdd,int MaxColors) {
 
             var map = new List<HashSet<T>>();
@@ -74,7 +74,7 @@ namespace SchedulingSystem {
                 for (int j = i + 1; j < sortedIndex.Length; j++) {
                     T courseToBeAdded = repVertex.First(x => x.Value == sortedIndex[j]).Key;
                     if (!CheckEdge(i, j) && isColored[j] == 0) {
-                        //TODO
+                        
                         //if (CanAdd(courseToBeAdded, map[map.Count - 1]){
                         //    isColored[j] = colors;
                         //    map[map.Count - 1].Add(courseToBeAdded);

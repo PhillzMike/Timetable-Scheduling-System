@@ -21,7 +21,7 @@ namespace SchedulingSystem
         public static DateTime GlobalStart;
         public static DateTime GlobalEnd;
         public static List<string> GlobalDays;
-        //TODO
+        //TODO return true is Start time and end time differ from global start and end
         public bool HasSpecialTime;
             /// <summary>
             /// 
