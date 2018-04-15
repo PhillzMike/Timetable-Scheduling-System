@@ -107,5 +107,11 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SchedulingSystem\SchedulingSystem.csproj">
+      <Project>{3fb1bfee-b8b9-4e7d-ac23-5d619c275c45}</Project>
+      <Name>SchedulingSystem</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace SchedulingSystem {
     //Derry
-    class Venue {
+    [Serializable]
+   public class Venue {
         private string VenueName;
         private int VenueCapacity;
         private bool _isLab;
@@ -29,7 +30,10 @@ namespace SchedulingSystem {
         {
             get => noOfVenues;
         }
-        
+        public override string ToString() {
+            return VenueName;
+
+        }
 
     }
 }

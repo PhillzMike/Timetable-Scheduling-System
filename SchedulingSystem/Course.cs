@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace SchedulingSystem
 {
+    [Serializable]
    public class Course
     {
         private string code;
@@ -46,7 +47,7 @@ namespace SchedulingSystem
             this.students = new HashSet<Student>();
             this.validDays = new List<string>();
             foreach (var day in validDays){
-                this.validDays.Add(day);
+                this.validDays.Add(day.Trim().ToLower());
             }
         }
 
@@ -59,6 +60,16 @@ namespace SchedulingSystem
         public int Level { get => level;}
         public HashSet<Lecturer> Lecturers { get => lecturers; }
         public HashSet<Student> Students { get => students; }
+        public override string ToString() {
+            return Code;
+        }
+        public override bool Equals(object obj) {
+            if(obj is Course) {
+                if (Code.Equals((obj as Course).Code))
+                    return true;
+            }
+            return false;
+        }
 
     }
 }

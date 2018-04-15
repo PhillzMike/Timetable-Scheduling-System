@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace SchedulingSystem
 {
     //Peace
+    [Serializable]
     public class Student
     {
         private String name;
@@ -31,6 +32,10 @@ namespace SchedulingSystem
         {
              get => coursesRegistered;
         }
-        
+        public override string ToString() {
+            return name;
+
+        }
+
     }
 }

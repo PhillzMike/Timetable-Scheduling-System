@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -9,7 +12,8 @@ namespace SchedulingSystem
 {  
     
     //Teni
-    class Input
+    [Serializable]
+    public class Input
     {
         public Tuple<DateTime, DateTime> timeFrame;
         public String InfoTable;
@@ -19,25 +23,77 @@ namespace SchedulingSystem
         public List<Lecturer> AllLecturers;
         public Input(string Datatable, Tuple<DateTime, DateTime> timeSchedule)
         {
+            errors = new List<string>();
             this.InfoTable = Datatable;
             this.timeFrame = timeSchedule;
-            GenerateCourses(ReadInput(2));
-
-            AllStudents = GenerateStudents(ReadInput(1));
-           
-            AllLecturers = GenerateLecturers(ReadInput(3));
-            AllVenues =  GenerateVenues(ReadInput(4));
-        }
-        
-        public  Excel.Range ReadInput( int sheetnumber)
-        {
+            AllCourses = new Dictionary<string, Course>();
             Excel.Application Table = new Excel.Application();
-            Excel.Workbook  TableWorkBook = Table.Workbooks.Open(InfoTable);
-            Excel._Worksheet  TableWorkSheet = TableWorkBook.Sheets[sheetnumber];
-            Excel.Range PartUsed = TableWorkSheet.UsedRange;
+            Excel.Workbook TableWorkBook = Table.Workbooks.Open(InfoTable);
 
-            return PartUsed;
+
+            Excel._Worksheet CourseSheet = TableWorkBook.Sheets[2];
+            Excel.Range CourseUsed = CourseSheet.UsedRange;
+            GenerateCourses(CourseUsed);
+            
+
+            Excel._Worksheet Stu_Sheet = TableWorkBook.Sheets[1];
+            Excel.Range Stu_Used = Stu_Sheet.UsedRange;
+            AllStudents = GenerateStudents(Stu_Used);
+           
+
+            Excel._Worksheet Lect_Sheet = TableWorkBook.Sheets[3];
+            Excel.Range Lect_Used = Lect_Sheet.UsedRange;
+            AllLecturers = GenerateLecturers(Lect_Used);
+            
+
+            Excel._Worksheet Ven_Sheet = TableWorkBook.Sheets[4];
+            Excel.Range Ven_Used = Ven_Sheet.UsedRange;
+            AllVenues = GenerateVenues(Ven_Used);
+            
+           
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+
+            Marshal.ReleaseComObject(CourseUsed);
+            Marshal.ReleaseComObject(CourseSheet);
+            Marshal.ReleaseComObject(Stu_Used);
+            Marshal.ReleaseComObject(Stu_Sheet);
+            Marshal.ReleaseComObject(Lect_Used);
+            Marshal.ReleaseComObject(Lect_Sheet);
+            Marshal.ReleaseComObject(Ven_Used);
+            Marshal.ReleaseComObject(Ven_Sheet);
+
+            TableWorkBook.Close();
+            Marshal.ReleaseComObject(TableWorkBook);
+            Table.Quit();
+            Marshal.ReleaseComObject(Table);
         }
+        public void Save(string path) {
+            try {
+                File.SetAttributes(path, File.GetAttributes(path) & ~FileAttributes.ReadOnly);
+            } catch { }
+            try {
+                using (FileStream fsout = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None)) {
+                    new BinaryFormatter().Serialize(fsout, this);
+                    File.SetAttributes(path, (File.GetAttributes(path) | FileAttributes.ReadOnly));
+                }
+            } catch {
+                throw new Exception("An error Occured, Could not save input Details");
+            }
+        }
+        public static Input Load(string Path) {
+            Input l;
+            try {
+                using (FileStream fsin = new FileStream(Path, FileMode.Open, FileAccess.Read, FileShare.None)) {
+                    l = (Input)(new BinaryFormatter().Deserialize(fsin));
+                }
+            } catch (FileNotFoundException) {
+                throw new FileNotFoundException("The file doesn't contain a valid Serialized Input");
+            }
+            return l;
+        }
+       
         
 
         public List<Student> GenerateStudents(Excel.Range sp)
@@ -51,11 +107,11 @@ namespace SchedulingSystem
                     string name = sp.Cells[i, 1].Value2;
                     int level = (int) sp.Cells[i, 2].Value2;
                     List<Course> coursesOffered = new List<Course>();
-                    for (int j = 1; j <= sp.Columns.Count; j++)
+                    for (int j = 3; j <= sp.Columns.Count; j++)
                     {       //check if a course cell is empty
                         if (sp.Cells[i, j] != null && !string.IsNullOrWhiteSpace(sp.Cells[i, j].Value2 + "")  )
                         {      //checks the if the courses in all the list of courses 
-                            if (AllCourses.ContainsKey(sp.Cells[i, j].Value2))
+                            if (AllCourses.ContainsKey(sp.Cells[i, j].Value2+""))
                             {
                                 coursesOffered.Add(AllCourses[sp.Cells[i, j].Value2]);
                                 if (AllCourses.ContainsKey(sp.Cells[i, j].Value2 + "l(4)b")) {
@@ -91,8 +147,9 @@ namespace SchedulingSystem
                 if (string.IsNullOrWhiteSpace(sp.Cells[i, 1].Value2 +"") || string.IsNullOrWhiteSpace(sp.Cells[i, 2].Value2 + ""))
                     continue;
 
-                   string code = sp.Cells[i, 1];
-                   int level = (int)sp.Cells[i, 2];
+                   string code = sp.Cells[i, 1].Value2;
+                code = code.Trim().ToLower();
+                   int level = (int)sp.Cells[i, 2].Value2;
                 int wCH; 
                 int wLH;
                 DateTime sTF;
@@ -102,27 +159,27 @@ namespace SchedulingSystem
                 if (string.IsNullOrWhiteSpace(sp.Cells[i, 3].Value2 + ""))
                     wCH = 0;
                 else
-                    wCH = (int)sp.Cells[i, 3];
+                    wCH = (int)sp.Cells[i, 3].Value2;
                 if (string.IsNullOrWhiteSpace(sp.Cells[i, 4].Value2 + ""))
                     wLH = 0;
                 else
-                    wLH= (int)sp.Cells[i, 4];
+                    wLH= (int)sp.Cells[i, 4].Value2;
 
                 if (string.IsNullOrWhiteSpace(sp.Cells[i, 5].Value2 + ""))
                     sTF = timeFrame.Item1;
                 else
-                    sTF = DateTime.ParseExact(sp.Cells[i, 5], "hh:mm", System.Globalization.CultureInfo.CurrentCulture);
+                    sTF = DateTime.ParseExact(sp.Cells[i, 5].Value2, "hh:mm", System.Globalization.CultureInfo.CurrentCulture);
 
                 if (string.IsNullOrWhiteSpace(sp.Cells[i, 6].Value2 + ""))
                     eTF = timeFrame.Item2;
                 else
-                    eTF = DateTime.ParseExact(sp.Cells[i, 6], "hh:mm", System.Globalization.CultureInfo.CurrentCulture);
+                    eTF = DateTime.ParseExact(sp.Cells[i, 6].Value2, "hh:mm", System.Globalization.CultureInfo.CurrentCulture);
 
                 if (string.IsNullOrWhiteSpace(sp.Cells[i, 7].Value2 + ""))
                     nvD = new List<String>() { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" };
                 else
                 {
-                    vD = sp.Cells[i, 7];
+                    vD = sp.Cells[i, 7].Value2;
                     nvD = vD.Split(',').ToList();
                 }
                 if(wCH + wLH > 0) {
@@ -156,14 +213,14 @@ namespace SchedulingSystem
             {
                 if (!string.IsNullOrWhiteSpace(sp.Cells[i, 1].Value2 + ""))
                 {
-                    string lecturername = sp.Cells[i, 2];
+                    string lecturername = sp.Cells[i, 1].Value2;
                     List<Course> LecturerCourses = new List<Course>();
                  
-                    for (int j = 1; j <= sp.Columns.Count; j++)
+                    for (int j = 2; j <= sp.Columns.Count; j++)
                     {       //check if a course cell is empty
                         if (sp.Cells[i, j] != null && !string.IsNullOrWhiteSpace(sp.Cells[i, j].Value2 + ""))
                         {      //checks the if the courses in all the list of courses 
-                            if (AllCourses.ContainsKey(sp.Cells[i, j].Value2))
+                            if (AllCourses.ContainsKey(sp.Cells[i, j].Value2+""))
                             {
                                 LecturerCourses.Add(AllCourses[sp.Cells[i, j].Value2]);
                                 if (AllCourses.ContainsKey(sp.Cells[i, j].Value2 + "l(4)b")) {
@@ -189,6 +246,7 @@ namespace SchedulingSystem
                     Error("Row " + i + " had an error and was skipped");
                 }
             }
+           
             return AllLecturers;
          }
                
@@ -202,12 +260,12 @@ namespace SchedulingSystem
                 bool isLab = false;
                 if (string.IsNullOrWhiteSpace(sp.Cells[i, 1].Value2 + "") || string.IsNullOrWhiteSpace(sp.Cells[i, 2].Value2 + ""))
                    continue;
-                 string VenueName= sp.Cells[i, 1];
-                 int VenueCapacity = (int)sp.Cells[i, 2];
+                 string VenueName= sp.Cells[i, 1].Value2;
+                 int VenueCapacity = (int)sp.Cells[i, 2].Value2;
                  string LabType = "";
 
-             if (!string.IsNullOrWhiteSpace(sp.Cells[i, 1].Value2 + "")) { 
-                    LabType = sp.Cells[i, 3];
+             if (!string.IsNullOrWhiteSpace(sp.Cells[i, 3].Value2 + "")) { 
+                    LabType = sp.Cells[i, 3].Value2+"";
                 }
                LabType =  LabType.ToLower().Trim();
                     if (LabType == "true")
@@ -219,11 +277,12 @@ namespace SchedulingSystem
             }
             return Venues;
         }
-           
+
         //public List<Course> GetALlCourses { get => li}
+        public List<String> errors;
         public void Error(string errortype)
         {
-
+            errors.Add(errortype);
         }
     }
 

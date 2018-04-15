@@ -43,7 +43,6 @@
   <ItemGroup>
     <Compile Include="Course.cs" />
     <Compile Include="Timetable.cs" />
-    <Compile Include="TimeTable.pt.cs" />
     <Compile Include="Venue.cs" />
     <Compile Include="InputClass.cs" />
     <Compile Include="Matrix.cs" />

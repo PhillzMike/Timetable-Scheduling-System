@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 namespace SchedulingSystem {
     //Seyi
+    [Serializable]
     public class Lecturer {
         private string name;
         private List<Course> CourseTaken;
@@ -22,6 +23,10 @@ namespace SchedulingSystem {
         }
         public List<Course> Courses {
             get => new List<Course>(CourseTaken);
+        }
+        public override string ToString() {
+            return name;
+            
         }
     }
 }

@@ -6,19 +6,16 @@ using System.Threading.Tasks;
 
 namespace SchedulingSystem {
     //3dO
-    public partial class Timetable {
-        Graph<Course> icarly;
+    public class Timetable {
+        
         HashSet<Course> AllCourses;
         HashSet<string> DoW;
         int LoP;
         int NoP;
         HashSet<Venue> allVenues;
         public Timetable(string toExcel, Tuple<DateTime, DateTime> DailyTime,int LengthOfPeriod, HashSet<string> DaysOfWeek ) {
-            //
-            //public Timetable(string toExcel, Tuple<DateTime, DateTime> DailyTime)
-            //{
-                allVenues = new HashSet<Venue>();
-                this.DoW = DaysOfWeek;
+            allVenues = new HashSet<Venue>();
+            this.DoW = DaysOfWeek;
             this.LoP = LengthOfPeriod;
             this.NoP = DailyTime.Item2.Hour - DailyTime.Item1.Hour;
             if(DailyTime.Item1.Minute> DailyTime.Item2.Minute) {
@@ -27,130 +24,146 @@ namespace SchedulingSystem {
             Input ngine = new Input(toExcel, DailyTime);
             allVenues.UnionWith(ngine.AllVenues);
             AllCourses = new HashSet<Course>(ngine.AllCourses.Values);
-             icarly = new Graph<Course>(ngine.AllCourses.Values);
-            foreach(Course c1 in AllCourses) {
-                foreach(Course c2 in AllCourses) {
-                    if(!c1.Equals(c2))
-                    if(c1.Students.Intersect(c2.Students).Count()+ c1.Lecturers.Intersect(c2.Lecturers).Count() > 0) {
-                            icarly.SetEdge(c1, c2);
-                    }
-                }
-            }
-            ClusterTogether();
+            ngine.Save(toExcel + ".timetable");
         }
-        List<HashSet<Course>> CanBeTogether;
-        Dictionary<Course, List<int>> Course_sets;
-        Dictionary<Course, Tuple<int,int>> HoursLeft;
-        Graph<HashSet<Course>> Diff_days;
-        List<List<HashSet<Course>>> Days;
-        void ClusterTogether(){
-            List<HashSet<Course>> init = icarly.ColorGraph();
-            foreach(HashSet<Course> hc in init) {
-              //  CanBeTogether.AddRange(UtilizeSpace(hc));
+        public Timetable(Input loaded, Tuple<DateTime, DateTime> DailyTime, int LengthOfPeriod, HashSet<string> DaysOfWeek) {
+            allVenues = new HashSet<Venue>();
+            allVenues.UnionWith(loaded.AllVenues);
+            this.DoW = DaysOfWeek;
+            this.LoP = LengthOfPeriod;
+            this.NoP = DailyTime.Item2.Hour - DailyTime.Item1.Hour;
+            if (DailyTime.Item1.Minute > DailyTime.Item2.Minute) {
+                NoP -= 1;
             }
-            
+            AllCourses = new HashSet<Course>(loaded.AllCourses.Values);
         }
-        void Diffy() {
-            Diff_days = new Graph<HashSet<Course>>(CanBeTogether);
-            foreach(HashSet<Course> hc in CanBeTogether) {
-                foreach (HashSet<Course> hc2 in CanBeTogether) {
-                    if (hc.Intersect(hc2).Count() > 0) {
-                        Diff_days.SetEdge(hc, hc2);
-                    }
-                }
-            }
-            GetBest(Diff_days.ColorGraph(NoP));
+        public List<List<Dictionary<Venue, Course>>> Generate() {
+            List<List<Dictionary<Venue, Course>>> TTv1 = ClusterTogether();
+            return TTv1;
         }
-        Dictionary<HashSet<int>,int> ScoreCombs;
-        void GetBest(List<HashSet<HashSet<Course>>> TT) {
-            foreach(HashSet<int> comb in Combin(TT.Count, DoW.Count)) {
-                List<HashSet<HashSet<Course>>> Sep = new List<HashSet<HashSet<Course>>>();
-                foreach (int n in comb) {
-                    Sep.Add(TT[n]);
-                }
-                ScoreCombs.Add(comb,Score(Sep));
-            }
-            //Assume all courses are 1 hour long
-            
+        
 
-
-        }
-
-        void Separate(List<HashSet<HashSet<Course>>> TimeT) {
-            List<List<List<Course>>> FinalTT = new List<List<List<Course>>>();
-            foreach(HashSet<HashSet<Course>> DayPeriods in TimeT) {
-                
-                foreach(HashSet<Course> SinglePeriod in DayPeriods) {
-                    foreach(Course c in SinglePeriod) {
-                        if (HoursLeft.ContainsKey(c)) {
-                            HoursLeft[c] = new Tuple<int, int>(c.WeeklyHours, HoursLeft[c].Item2 + 1);
-                        } else {
-                            HoursLeft.Add(c,new Tuple<int,int>(c.WeeklyHours, 1));
-                        }
-                    }
-                }
-            }
+        List<List<Dictionary<Venue, Course>>> ClusterTogether(){
+            Dictionary<string, HashSet<Course>> CourseOnDay = new Dictionary<string, HashSet<Course>>();
+            Dictionary<string, Graph<Course>> GraphOfDay = new Dictionary<string, Graph<Course>>();
+            Dictionary<Course, HashSet<string>> AssignedDays = new Dictionary<Course, HashSet<string>>();
+            List<string> DoneDays = new List<string>();
+            List<List<HashSet<Course>>> TTv1 = new List<List<HashSet<Course>>>();
             Random r = new Random();
-            foreach (HashSet<HashSet<Course>> DayPeriods in TimeT) {
-                List < List < Course > > Periods = new List<List<Course>>();
-                foreach (HashSet<Course> SinglePeriod in DayPeriods){
-                    List<Course> thisPeriod = new List<Course>();
-                    foreach (Course c in SinglePeriod){
-                        if (r.Next(10) < (((double)HoursLeft[c].Item1 / (double)HoursLeft[c].Item2) * 10)) {
-                            thisPeriod.Add(c);
-                            HoursLeft[c] = new Tuple<int, int>(HoursLeft[c].Item1 - 1, HoursLeft[c].Item2 - 1);
-                        } else {
-                            HoursLeft[c] = new Tuple<int, int>(HoursLeft[c].Item1, HoursLeft[c].Item2 - 1);
+            foreach (string Day in DoW) {
+                CourseOnDay.Add(Day, new HashSet<Course>());
+                foreach (Course c in AllCourses) {
+                    AssignedDays.Add(c, new HashSet<string>());
+                    if (c.ValidDays.Contains(Day.ToLower().Trim())) {
+                        int mustShow = (c.WeeklyHours / LoP) - AssignedDays[c].Count;
+                        int OutOf = c.ValidDays.Count - c.ValidDays.Intersect(DoneDays).Count();
+                        double priority = (double)mustShow / (double)OutOf;
+                        if (priority > 1) priority = 1;
+                        if (r.Next(10) < (priority * 10)){
+                            CourseOnDay[Day].Add(c);
+                            
                         }
                     }
-                    Periods.Add(thisPeriod);
                 }
-                FinalTT.Add(Periods);
-            }
-        }
-        int Score(List<HashSet<HashSet<Course>>> TimeT) {
-            Dictionary<Course, int> Remaining = new Dictionary<Course, int>();
-            foreach (HashSet<HashSet<Course>> DayPeriods in TimeT) {
-
-                foreach (HashSet<Course> SinglePeriod in DayPeriods) {
-                    foreach (Course c in SinglePeriod) {
-                        if (Remaining.ContainsKey(c)) {
-                            Remaining[c]--;
-                            if (Remaining[c] <= 0) {
-                                Remaining.Remove(c);
+                GraphOfDay.Add(Day, new Graph<Course>(CourseOnDay[Day]));
+                foreach (Course c1 in GraphOfDay[Day].GetVertices()) {
+                    foreach (Course c2 in GraphOfDay[Day].GetVertices()) {
+                        if (!c1.Equals(c2))
+                            if (c1.Students.Intersect(c2.Students).Count() + c1.Lecturers.Intersect(c2.Lecturers).Count() > 0) {
+                                GraphOfDay[Day].SetEdge(c1, c2);
                             }
+                    }
+                }
+                List<Dictionary<Course, Venue>> CanBeTogether = new List<Dictionary<Course, Venue>>();
+                //TODO
+                Delegate h = null;
+                List<HashSet<Course>> init = new List<HashSet<Course>>();
+                //List<HashSet<Course>> init = GraphOfDay[Day].ColorGraph(h,NoP);
+                foreach (HashSet<Course> hc in init) {
+                    foreach(Course c in hc) {
+                        AssignedDays[c].Add(Day);
+                    }
+                }
+                TTv1.Add(init);
+                DoneDays.Add(Day.ToLower().Trim());
+            }
+            return  GenerateVenues(TTv1);
+        }
+        bool CanAdd(Course c, HashSet<Course> hc) {
+            hc = new HashSet<Course>(hc);
+            if (hc.Contains(c))
+                return false;
+            if (hc.Count + 1 > allVenues.Count)
+                return false;
+            HashSet<Venue> Taken = new HashSet<Venue>();
+            hc.Add(c);
+            foreach(Course c2 in hc) {
+                int bestFit = int.MaxValue;
+                Venue best = null;
+                bool foundVenue = false;
+                foreach(Venue v in allVenues) {
+                    if (Taken.Contains(v)) continue;
+                    if(v.IsLab == c2.IsLab) {
+                        if (v.GetCapacity >= c2.Students.Count) {
+                            foundVenue = true;
+                            int fit = v.GetCapacity - c2.Students.Count;
+                            
+                            if (fit < bestFit) {
+                                bestFit = fit;
+                                best = v;
+                            }
+                            if (fit == 0)
+                                break;
                         }
                     }
                 }
+                if (!foundVenue)
+                    return false;
+                Taken.Add(best);
             }
-            int ret = 0;
-            foreach(Course left in Remaining.Keys) {
-                ret += Remaining[left];
+            return true;
+        }
+        List<List<Dictionary<Venue, Course>>> GenerateVenues(List<List<HashSet<Course>>> Ver1) {
+            List<List<Dictionary<Venue, Course>>> ret = new List<List<Dictionary<Venue, Course>>>();
+            foreach (List<HashSet<Course>> lhc in Ver1) {
+                List<Dictionary<Venue, Course>> ldvc = new List<Dictionary<Venue, Course>>();
+                foreach (HashSet<Course> hc in lhc) {
+                    ldvc.Add(AssignVenues(hc));
+                }
+                ret.Add(ldvc);
             }
             return ret;
         }
-        List<HashSet<int>> Combin(int tot,int count) {
-            CombinC = new List<HashSet<int>>();
-            CombinCode(tot, count, new HashSet<int>());
-            return CombinC;
-        }
-        List<HashSet<int>> CombinC;
-        void CombinCode(int tot,int count,HashSet<int> prev) {
-            //Why do I think this guy will still not work
-            //when i = tot-1,prev would contain 0 and tot-1 and count might be greater than  2
-            //You get??
-            for(int i = 0; i < tot; i++) {
-                if (!prev.Contains(i)) {
-                    prev.Add(i);
-                    if (count == 1) {
-                        CombinC.Add(new HashSet<int>(prev));
-                    } else {
-                        CombinCode(tot, count - 1, prev);
+        Dictionary<Venue, Course> AssignVenues(HashSet<Course> hc) {
+            Dictionary<Venue, Course> ret = new Dictionary<Venue, Course>();
+            foreach (Course c2 in hc) {
+                int bestFit = int.MaxValue;
+                Venue best = null;
+                bool foundVenue = false;
+                foreach (Venue v in allVenues) {
+                    if (ret.Keys.Contains(v)) continue;
+                    if (v.IsLab == c2.IsLab) {
+                        if (v.GetCapacity >= c2.Students.Count) {
+                            foundVenue = true;
+                            int fit = v.GetCapacity - c2.Students.Count;
+
+                            if (fit < bestFit) {
+                                bestFit = fit;
+                                best = v;
+                            }
+                            if (fit == 0)
+                                break;
+                        }
                     }
-                    prev.Remove(i);
                 }
+                if (!foundVenue)
+                    throw new Exception("This shouldn't be. Check logs");
+                ret.Add(best, c2);
             }
+            return ret;
         }
+
+      
     }
 
 }
