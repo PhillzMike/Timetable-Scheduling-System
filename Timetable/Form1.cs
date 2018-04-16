@@ -32,7 +32,7 @@ namespace Timetable {
             }
             SchedulingSystem.Timetable tt = new SchedulingSystem.Timetable(textBox1.Text, new Tuple<DateTime, DateTime>(start, end), 1, Days);
             List<List<Dictionary<Venue,Course>>> Gen = tt.Generate();
-            Output outp = new Output(@"D:\f\Documents\Visual Studio\TTSS\Timetable\output.xlsx", Gen, new Tuple<DateTime, DateTime>(start, end), Days, 60);
+            Output outp = new Output(@"C:\Users\Opsi Jay\Documents\Visual Studio 2017\Projects\Timetable\Timetable\output.xlsx", Gen, new Tuple<DateTime, DateTime>(start, end), Days, 60);
         }
 
         private void Button3_Click(object sender, EventArgs e) {
@@ -47,7 +47,7 @@ namespace Timetable {
             }
             SchedulingSystem.Timetable tt = new SchedulingSystem.Timetable(npt, new Tuple<DateTime, DateTime>(start, end), 1, Days);
             List<List<Dictionary<Venue, Course>>> Gen = tt.Generate();
-            Output outp = new Output(@"D:\f\Documents\Visual Studio\TTSS\Timetable\output.xlsx", Gen, new Tuple<DateTime, DateTime>(start, end), Days, 60);
+            Output outp = new Output(@"C:\Users\Opsi Jay\Documents\Visual Studio 2017\Projects\Timetable\Timetable\output.xlsx", Gen, new Tuple<DateTime, DateTime>(start, end), Days, 60);
         }
     }
 }

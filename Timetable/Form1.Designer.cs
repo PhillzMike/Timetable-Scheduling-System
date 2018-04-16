@@ -181,14 +181,14 @@
             this.checkedListBox1.BackColor = System.Drawing.SystemColors.Control;
             this.checkedListBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.checkedListBox1.FormattingEnabled = true;
-            this.checkedListBox1.Items.AddRange(new object[] {
-            "Monday",
-            "Tuesday",
-            "Wednesday",
-            "Thursday",
-            "Friday",
-            "Saturday",
-            "Sunday"});
+            this.checkedListBox1.Items.Add("Monday", true);
+            this.checkedListBox1.Items.Add("Monday", true);
+            this.checkedListBox1.Items.Add("Tuesday", true);
+            this.checkedListBox1.Items.Add("Wednesday", true);
+            this.checkedListBox1.Items.Add("Thursday", true);
+            this.checkedListBox1.Items.Add("Friday", true);
+            this.checkedListBox1.Items.Add("Saturday", false);
+            this.checkedListBox1.Items.Add("Sunday", false);
             this.checkedListBox1.Location = new System.Drawing.Point(493, 210);
             this.checkedListBox1.Name = "checkedListBox1";
             this.checkedListBox1.Size = new System.Drawing.Size(120, 105);
