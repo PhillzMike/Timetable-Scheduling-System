@@ -17,9 +17,8 @@ namespace SchedulingSystem {
                 this.repVertex.Add(item, i++);
             }
         }
-        //TODO return all vertices in Graph
         public IEnumerable<T> GetVertices() {
-            throw new NotImplementedException();
+            return repVertex.Keys;
         }
 
         public void SetEdge(T v, T v1) {
@@ -55,8 +54,7 @@ namespace SchedulingSystem {
         /// </summary>
         /// <param name="UpperLimit">The upper limit of each hashset Generated. If no limit, put 0</param>
         /// <returns></returns>
-        //TODO takes in a delegate to ensure you can add
-        public List<HashSet<T>> ColorGraph(Delegate CanAdd,int MaxColors) {
+        public List<HashSet<T>> ColorGraph(Func<T,HashSet<T>,bool> CanAdd,int MaxColors) {
 
             var map = new List<HashSet<T>>();
             var sortedIndex = SortVertex();
@@ -74,12 +72,12 @@ namespace SchedulingSystem {
                 for (int j = i + 1; j < sortedIndex.Length; j++) {
                     T courseToBeAdded = repVertex.First(x => x.Value == sortedIndex[j]).Key;
                     if (!CheckEdge(i, j) && isColored[j] == 0) {
-                        
-                        //if (CanAdd(courseToBeAdded, map[map.Count - 1]){
-                        //    isColored[j] = colors;
-                        //    map[map.Count - 1].Add(courseToBeAdded);
-                        //    noOfVertex++;
-                        //}
+
+                        if (CanAdd(courseToBeAdded, map[map.Count - 1])){
+                            isColored[j] = colors;
+                            map[map.Count - 1].Add(courseToBeAdded);
+                            noOfVertex++;
+                        }
                     }
 
                 }

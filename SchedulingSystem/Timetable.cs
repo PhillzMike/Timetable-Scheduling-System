@@ -9,11 +9,11 @@ namespace SchedulingSystem {
     public class Timetable {
         
         HashSet<Course> AllCourses;
-        HashSet<string> DoW;
+        List<string> DoW;
         int LoP;
         int NoP;
         HashSet<Venue> allVenues;
-        public Timetable(string toExcel, Tuple<DateTime, DateTime> DailyTime,int LengthOfPeriod, HashSet<string> DaysOfWeek ) {
+        public Timetable(string toExcel, Tuple<DateTime, DateTime> DailyTime,int LengthOfPeriod, List<string> DaysOfWeek ) {
             allVenues = new HashSet<Venue>();
             this.DoW = DaysOfWeek;
             this.LoP = LengthOfPeriod;
@@ -26,7 +26,7 @@ namespace SchedulingSystem {
             AllCourses = new HashSet<Course>(ngine.AllCourses.Values);
             ngine.Save(toExcel + ".timetable");
         }
-        public Timetable(Input loaded, Tuple<DateTime, DateTime> DailyTime, int LengthOfPeriod, HashSet<string> DaysOfWeek) {
+        public Timetable(Input loaded, Tuple<DateTime, DateTime> DailyTime, int LengthOfPeriod, List<string> DaysOfWeek) {
             allVenues = new HashSet<Venue>();
             allVenues.UnionWith(loaded.AllVenues);
             this.DoW = DaysOfWeek;
@@ -50,10 +50,13 @@ namespace SchedulingSystem {
             List<string> DoneDays = new List<string>();
             List<List<HashSet<Course>>> TTv1 = new List<List<HashSet<Course>>>();
             Random r = new Random();
-            foreach (string Day in DoW) {
+            foreach (Course c in AllCourses)
+            {
+                AssignedDays.Add(c, new HashSet<string>());
+            }
+                foreach (string Day in DoW) {
                 CourseOnDay.Add(Day, new HashSet<Course>());
                 foreach (Course c in AllCourses) {
-                    AssignedDays.Add(c, new HashSet<string>());
                     if (c.ValidDays.Contains(Day.ToLower().Trim())) {
                         int mustShow = (c.WeeklyHours / LoP) - AssignedDays[c].Count;
                         int OutOf = c.ValidDays.Count - c.ValidDays.Intersect(DoneDays).Count();
@@ -75,8 +78,7 @@ namespace SchedulingSystem {
                     }
                 }
                 List<Dictionary<Course, Venue>> CanBeTogether = new List<Dictionary<Course, Venue>>();
-                //TODO Make Delegate
-                Delegate h = null;
+                Func<Course,HashSet<Course>,bool> h = CanAdd;
                 List<HashSet<Course>> init = GraphOfDay[Day].ColorGraph(h,NoP);
                 foreach (HashSet<Course> hc in init) {
                     foreach(Course c in hc) {
@@ -88,7 +90,6 @@ namespace SchedulingSystem {
             }
             return  GenerateVenues(TTv1);
         }
-        //TODO Delegate function
         bool CanAdd(Course c, HashSet<Course> hc) {
             hc = new HashSet<Course>(hc);
             if (hc.Contains(c))
