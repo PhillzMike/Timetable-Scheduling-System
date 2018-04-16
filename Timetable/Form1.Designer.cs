@@ -38,6 +38,9 @@
             this.checkedListBox1 = new System.Windows.Forms.CheckedListBox();
             this.label6 = new System.Windows.Forms.Label();
             this.button3 = new System.Windows.Forms.Button();
+            this.label7 = new System.Windows.Forms.Label();
+            this.button4 = new System.Windows.Forms.Button();
+            this.textBox2 = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown3)).BeginInit();
@@ -181,17 +184,18 @@
             this.checkedListBox1.BackColor = System.Drawing.SystemColors.Control;
             this.checkedListBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.checkedListBox1.FormattingEnabled = true;
-            this.checkedListBox1.Items.Add("Monday", true);
-            this.checkedListBox1.Items.Add("Monday", true);
-            this.checkedListBox1.Items.Add("Tuesday", true);
-            this.checkedListBox1.Items.Add("Wednesday", true);
-            this.checkedListBox1.Items.Add("Thursday", true);
-            this.checkedListBox1.Items.Add("Friday", true);
-            this.checkedListBox1.Items.Add("Saturday", false);
-            this.checkedListBox1.Items.Add("Sunday", false);
+            this.checkedListBox1.Items.AddRange(new object[] {
+            "Monday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"});
             this.checkedListBox1.Location = new System.Drawing.Point(493, 210);
             this.checkedListBox1.Name = "checkedListBox1";
-            this.checkedListBox1.Size = new System.Drawing.Size(120, 105);
+            this.checkedListBox1.Size = new System.Drawing.Size(120, 120);
             this.checkedListBox1.TabIndex = 12;
             // 
             // label6
@@ -213,11 +217,40 @@
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.Button3_Click);
             // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(186, 368);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(88, 13);
+            this.label7.TabIndex = 17;
+            this.label7.Text = "Select Output file";
+            // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(650, 387);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(24, 20);
+            this.button4.TabIndex = 16;
+            this.button4.Text = "...";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // textBox2
+            // 
+            this.textBox2.Location = new System.Drawing.Point(186, 387);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(488, 20);
+            this.textBox2.TabIndex = 15;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(958, 544);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.button4);
+            this.Controls.Add(this.textBox2);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.checkedListBox1);
@@ -261,6 +294,9 @@
         private System.Windows.Forms.CheckedListBox checkedListBox1;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.TextBox textBox2;
     }
 }
 
