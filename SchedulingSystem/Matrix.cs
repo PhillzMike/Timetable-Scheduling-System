@@ -81,6 +81,8 @@ namespace SchedulingSystem {
                     }
 
                 }
+                if (MaxColors == colors)
+                    return map;
 
             }
             return map;
@@ -98,18 +100,6 @@ namespace SchedulingSystem {
             }
             return map;
         }
-        //public bool Validate(List<Course> courses, Course course)
-        //{
-        //    //TOrDO add Student
-        //    foreach (var item in courses)
-        //    {
-        //        if(item.Lecturers.Intersect(course.Lecturers).Count() != 0)
-        //        {
-        //            return false;
-        //        }
-        //    }
-        //    return true;
-        //}
     }
 }
 

@@ -21,6 +21,7 @@ namespace SchedulingSystem
         public List<Venue> AllVenues;
         public List<Student> AllStudents;
         public List<Lecturer> AllLecturers;
+        Dictionary<string, Dictionary<int, List<Course>>> Departments;
         public Input(string Datatable, Tuple<DateTime, DateTime> timeSchedule)
         {
             errors = new List<string>();
@@ -31,22 +32,26 @@ namespace SchedulingSystem
             Excel.Workbook TableWorkBook = Table.Workbooks.Open(InfoTable);
 
 
-            Excel._Worksheet CourseSheet = TableWorkBook.Sheets[2];
+            Excel._Worksheet CourseSheet = TableWorkBook.Sheets[3];
             Excel.Range CourseUsed = CourseSheet.UsedRange;
             GenerateCourses(CourseUsed);
-            
+
+            Excel._Worksheet DeptSheet = TableWorkBook.Sheets[2];
+            Excel.Range DeptUsed = DeptSheet.UsedRange;
+            Departments = GenerateDepartments(DeptUsed);
+
 
             Excel._Worksheet Stu_Sheet = TableWorkBook.Sheets[1];
             Excel.Range Stu_Used = Stu_Sheet.UsedRange;
             AllStudents = GenerateStudents(Stu_Used);
            
 
-            Excel._Worksheet Lect_Sheet = TableWorkBook.Sheets[3];
+            Excel._Worksheet Lect_Sheet = TableWorkBook.Sheets[4];
             Excel.Range Lect_Used = Lect_Sheet.UsedRange;
             AllLecturers = GenerateLecturers(Lect_Used);
             
 
-            Excel._Worksheet Ven_Sheet = TableWorkBook.Sheets[4];
+            Excel._Worksheet Ven_Sheet = TableWorkBook.Sheets[5];
             Excel.Range Ven_Used = Ven_Sheet.UsedRange;
             AllVenues = GenerateVenues(Ven_Used);
             
@@ -57,6 +62,8 @@ namespace SchedulingSystem
 
             Marshal.ReleaseComObject(CourseUsed);
             Marshal.ReleaseComObject(CourseSheet);
+            Marshal.ReleaseComObject(DeptUsed);
+            Marshal.ReleaseComObject(DeptSheet);
             Marshal.ReleaseComObject(Stu_Used);
             Marshal.ReleaseComObject(Stu_Sheet);
             Marshal.ReleaseComObject(Lect_Used);
@@ -93,37 +100,70 @@ namespace SchedulingSystem
             }
             return l;
         }
-       
-        
 
-        public List<Student> GenerateStudents(Excel.Range sp)
+        public Dictionary<string, Dictionary<int, List<Course>>> GenerateDepartments(Excel.Range sp) {
+            Dictionary<string, Dictionary<int, List<Course>>> s = new Dictionary<string, Dictionary<int, List<Course>>>();
+            for (int i = 3; i <= sp.Rows.Count; i++) {
+                if (!string.IsNullOrWhiteSpace(sp.Cells[i, 1].Value2 + "") && !string.IsNullOrWhiteSpace(sp.Cells[i, 2].Value2 + "")) {
+                    string name = sp.Cells[i, 1].Value2;
+                    int level = (int)sp.Cells[i, 2].Value2;
+                    if (!s.ContainsKey(name)) {
+                        s.Add(name, new Dictionary<int, List<Course>>());
+                    }
+                    if (!s[name].ContainsKey(level)) {
+                        s[name].Add(level, new List<Course>());
+                    }
+                    for (int j = 3; j <= sp.Columns.Count; j++) {
+                        if(AllCourses.ContainsKey(sp.Cells[i, j].Value2+"")) {
+                            s[name][level].Add(AllCourses[sp.Cells[i, j].Value2]);
+                        }
+                        if (AllCourses.ContainsKey(sp.Cells[i, j].Value2+ "l(4)b")) {
+                            s[name][level].Add(AllCourses[sp.Cells[i, j].Value2 + "l(4)b"]);
+                        }
+                        
+                    }
+                    }
+                }
+            return s;
+        }
+
+            public List<Student> GenerateStudents(Excel.Range sp)
         {
             List<Student> studentList = new List<Student>();
            for (int i =3;  i<= sp.Rows.Count; i++)
             {
                 //checks if student name or level was omitted and skips the row
-                if (!string.IsNullOrWhiteSpace(sp.Cells[i, 1].Value2 +"") || !string.IsNullOrWhiteSpace(sp.Cells[i, 2].Value2 + ""))
+                if (!string.IsNullOrWhiteSpace(sp.Cells[i, 1].Value2 +"") && !string.IsNullOrWhiteSpace(sp.Cells[i, 2].Value2 + "") && !string.IsNullOrWhiteSpace(sp.Cells[i, 3].Value2 + ""))
                 {
                     string name = sp.Cells[i, 1].Value2;
                     int level = (int) sp.Cells[i, 2].Value2;
+                    string dept = sp.Cells[i, 3].Value2;
                     List<Course> coursesOffered = new List<Course>();
+                    if (Departments.ContainsKey(dept)) {
+                        if (Departments[dept].ContainsKey(level)) {
+                            coursesOffered = new List<Course>(Departments[dept][level]);
+                        }
+                    }
                     for (int j = 3; j <= sp.Columns.Count; j++)
                     {       //check if a course cell is empty
                         if (sp.Cells[i, j] != null && !string.IsNullOrWhiteSpace(sp.Cells[i, j].Value2 + "")  )
                         {      //checks the if the courses in all the list of courses 
-                            if (AllCourses.ContainsKey(sp.Cells[i, j].Value2+""))
-                            {
-                                coursesOffered.Add(AllCourses[sp.Cells[i, j].Value2]);
-                                if (AllCourses.ContainsKey(sp.Cells[i, j].Value2 + "l(4)b")) {
-                                    coursesOffered.Add(AllCourses[sp.Cells[i, j].Value2 + "l(4)b"]);
+                            bool remove = false;
+                            bool hasLab = false;
+                            string crs = sp.Cells[i, j].Value2;
+                            if (crs[0] == '~') remove = true;
+                            crs = crs.Substring(1);
+                            if (AllCourses.ContainsKey(crs + "l(4)b")) hasLab = true;
+                            if (AllCourses.ContainsKey(crs)) {
+                                if (remove) {
+                                    coursesOffered.Remove(AllCourses[crs]);
+                                    if (hasLab) coursesOffered.Remove(AllCourses[crs + "l(4)b"]);
+                                } else {
+                                    coursesOffered.Add(AllCourses[crs]);
+                                    if (hasLab) coursesOffered.Add(AllCourses[crs + "l(4)b"]);
                                 }
-                            } else if (AllCourses.ContainsKey(sp.Cells[i, j].Value2 + "l(4)b")) {
-                                coursesOffered.Add(AllCourses[sp.Cells[i, j].Value2 + "l(4)b"]);
                             }
-                            else
-                            {
-                                Error("For Student " + name + " , there is no course" + sp.Cells[i, j].Value2);
-                            }
+                            
                         }
                     }
                     //create a Student objets and adds it to the list of Students
@@ -167,14 +207,23 @@ namespace SchedulingSystem
 
                 if (string.IsNullOrWhiteSpace(sp.Cells[i, 5].Value2 + ""))
                     sTF = timeFrame.Item1;
-                else
-                    sTF = DateTime.ParseExact(sp.Cells[i, 5].Value2, "hh:mm", System.Globalization.CultureInfo.CurrentCulture);
+                else {
+                    string inpt = sp.Cells[i, 5].Value2+"";
+                    string[] pair = inpt.Split(':');
+                    int.TryParse(pair[0], out int first);
+                    int.TryParse(pair[1], out int second);
+                    sTF = new DateTime(2000, 01, 01,first, second, 0);
+                }
 
                 if (string.IsNullOrWhiteSpace(sp.Cells[i, 6].Value2 + ""))
                     eTF = timeFrame.Item2;
-                else
-                    eTF = DateTime.ParseExact(sp.Cells[i, 6].Value2, "hh:mm", System.Globalization.CultureInfo.CurrentCulture);
-
+                else {
+                    string inpt = sp.Cells[i, 6].Value2+"";
+                    string[] pair = inpt.Split(':');
+                    int.TryParse(pair[0], out int first);
+                    int.TryParse(pair[1], out int second);
+                    eTF = new DateTime(2000, 01, 01, first, second, 0);
+                }
                 if (string.IsNullOrWhiteSpace(sp.Cells[i, 7].Value2 + ""))
                     nvD = new List<String>() { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" };
                 else
