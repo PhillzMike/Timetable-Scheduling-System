@@ -58,13 +58,14 @@ namespace SchedulingSystem {
                 foreach (string Day in DoW) {
                 CourseOnDay.Add(Day, new HashSet<Course>());
                 //Check
-                CourseOnDay[Day].IntersectWith(notValidInDay);
+                //CourseOnDay[Day].IntersectWith(notValidInDay);
                 foreach (Course c in AllCourses) {
                     if (c.ValidDays.Contains(Day.ToLower().Trim())) {
                         int mustShow = (c.WeeklyHours / LoP) - AssignedDays[c].Count;
                         int OutOf = c.ValidDays.Count - c.ValidDays.Intersect(DoneDays).Count();
                         double priority = (double)mustShow / (double)OutOf;
-                        if (priority > 1) priority = 1;
+                        if (priority > 1)
+                            priority = 1;
                         if (r.Next(10) < (priority * 10)){
                             CourseOnDay[Day].Add(c);
                             
@@ -86,12 +87,45 @@ namespace SchedulingSystem {
                 foreach (HashSet<Course> hc in init) {
                     foreach(Course c in hc) {
                         AssignedDays[c].Add(Day);
+
                     }
                 }
                 TTv1.Add(init);
                 DoneDays.Add(Day.ToLower().Trim());
             }
+            Dictionary<Course, int> igno = ignored(TTv1);
+
             return  GenerateVenues(TTv1);
+        }
+        Dictionary<Course,int> ignored(List<List<HashSet<Course>>> tt) {
+            Dictionary<Course, int> ignor = new Dictionary<Course, int>();
+            foreach (Course c in AllCourses) {
+                ignor.Add(c, c.WeeklyHours);
+            }
+            Dictionary<Course, List<Tuple<int, int>>> help = new Dictionary<Course, List<Tuple<int, int>>>();
+            foreach (Course c in AllCourses) {
+                help.Add(c, new List<Tuple<int, int>>());
+            }
+            int i = -1;
+            foreach (List<HashSet<Course>> t in tt) {
+                i++;
+                int j = -1;
+                foreach( HashSet<Course> hc in t) {
+                    j++;
+                    foreach(Course c in hc) {
+                        help[c].Add(new Tuple<int, int>(i, j));
+                        if (ignor.ContainsKey(c)) {
+                            ignor[c]-=1;
+                            if (ignor[c] == 0) {
+                                ignor.Remove(c);
+                            }
+                        } else {
+                            ignor.Add(c, -1);
+                        }
+                    }
+                }
+            }
+            return ignor;
         }
         bool CanAdd(Course c, HashSet<Course> hc) {
             hc = new HashSet<Course>(hc);

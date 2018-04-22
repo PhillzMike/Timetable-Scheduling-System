@@ -95,7 +95,7 @@ namespace SchedulingSystem {
         void PrintPeriod(Dictionary<Venue,Course> Period, int r,int c) {
             for(int i = 0; i < Venues.Count; i++) {
                 if (Period.ContainsKey(Venues[i])) {
-                    XL.Cells[r +i, c ].Value2 = Period[Venues[i]].ToString();
+                    XL.Cells[r +i, c ].Value2 = (Period[Venues[i]].IsLab)? Period[Venues[i]].ToString()+"(Lab)": Period[Venues[i]].ToString();
                 }
             }
         }
@@ -105,7 +105,7 @@ namespace SchedulingSystem {
                 XL.Cells[r+1, c+i].Value2 = Periods[i-1];
             }
             for (int i = 0; i <Venues.Count; i++) {
-                XL.Cells[r + i+2 , c ].Value2 = Venues[i].ToString();
+                XL.Cells[r + i+2 , c ].Value2 = (Venues[i].IsLab)?Venues[i].ToString()+"(Lab)": Venues[i].ToString();
             }
         }
     }

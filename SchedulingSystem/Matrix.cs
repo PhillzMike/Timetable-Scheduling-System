@@ -69,10 +69,17 @@ namespace SchedulingSystem {
                 isColored[sortedIndex[i]] = ++colors;
                 T present = repVertex.First(x => x.Value == sortedIndex[i]).Key;
                 map.Add(new HashSet<T> { present });
-                for (int j = i + 1; j < sortedIndex.Length || j == i+1+MaxColors; j++) {
+                for (int j = i + 1; j < sortedIndex.Length ; j++) {
                     T courseToBeAdded = repVertex.First(x => x.Value == sortedIndex[j]).Key;
-                    if (!CheckEdge(i, j) && isColored[j] == 0) {
-
+                    if ( isColored[j] == 0) {
+                        bool carryOn = true;
+                        foreach(T oldCourse in map[map.Count - 1]) {
+                            if (CheckEdge(oldCourse, courseToBeAdded)) {
+                                carryOn = false;
+                            }
+                        }
+                        if (!carryOn)
+                            continue;
                         if (CanAdd(courseToBeAdded, map[map.Count - 1])){
                             isColored[j] = colors;
                             map[map.Count - 1].Add(courseToBeAdded);
@@ -80,6 +87,9 @@ namespace SchedulingSystem {
                         }
                     }
 
+                }
+                if (map.Count == MaxColors) {
+                    break;
                 }
                 
             }
