@@ -49,6 +49,7 @@ namespace SchedulingSystem {
             Dictionary<Course, HashSet<string>> AssignedDays = new Dictionary<Course, HashSet<string>>();
             List<string> DoneDays = new List<string>();
             List<List<HashSet<Course>>> TTv1 = new List<List<HashSet<Course>>>();
+            HashSet<Course> notValidInDay = new HashSet<Course>();
             Random r = new Random();
             foreach (Course c in AllCourses)
             {
@@ -56,6 +57,8 @@ namespace SchedulingSystem {
             }
                 foreach (string Day in DoW) {
                 CourseOnDay.Add(Day, new HashSet<Course>());
+                //Check
+                CourseOnDay[Day].IntersectWith(notValidInDay);
                 foreach (Course c in AllCourses) {
                     if (c.ValidDays.Contains(Day.ToLower().Trim())) {
                         int mustShow = (c.WeeklyHours / LoP) - AssignedDays[c].Count;
@@ -79,7 +82,7 @@ namespace SchedulingSystem {
                 }
                 List<Dictionary<Course, Venue>> CanBeTogether = new List<Dictionary<Course, Venue>>();
                 Func<Course,HashSet<Course>,bool> h = CanAdd;
-                List<HashSet<Course>> init = GraphOfDay[Day].ColorGraph(h,NoP);
+                List<HashSet<Course>> init = GraphOfDay[Day].ColorGraph(h,NoP,out notValidInDay);
                 foreach (HashSet<Course> hc in init) {
                     foreach(Course c in hc) {
                         AssignedDays[c].Add(Day);
