@@ -80,7 +80,7 @@ namespace SchedulingSystem {
                         if (!carryOn)
                             continue;
                         if (CanAdd(courseToBeAdded, map[map.Count - 1])){
-                            isColored[j] = colors;
+                            isColored[sortedIndex[j]] = colors;
                             map[map.Count - 1].Add(courseToBeAdded);                         
                         }
                     }
