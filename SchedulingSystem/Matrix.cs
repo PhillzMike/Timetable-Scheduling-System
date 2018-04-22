@@ -69,7 +69,7 @@ namespace SchedulingSystem {
                 map.Add(new HashSet<T> { present });             
                 for (int j = i + 1; j < sortedIndex.Length ; j++) {
                     T courseToBeAdded = repVertex.First(x => x.Value == sortedIndex[j]).Key;
-                    if ( isColored[j] == 0) {
+                    if ( isColored[sortedIndex[j]] == 0) {
                         bool carryOn = true;
                         foreach(T oldCourse in map[map.Count - 1]) {
                             if (CheckEdge(oldCourse, courseToBeAdded)) {
