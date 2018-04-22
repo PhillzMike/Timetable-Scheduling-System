@@ -94,7 +94,6 @@ namespace SchedulingSystem {
                 DoneDays.Add(Day.ToLower().Trim());
             }
             Dictionary<Course, int> igno = ignored(TTv1);
-
             return  GenerateVenues(TTv1);
         }
         Dictionary<Course,int> ignored(List<List<HashSet<Course>>> tt) {

@@ -55,20 +55,18 @@ namespace SchedulingSystem {
         /// <param name="UpperLimit">The upper limit of each hashset Generated. If no limit, put 0</param>
         /// <returns></returns>
         public List<HashSet<T>> ColorGraph(Func<T,HashSet<T>,bool> CanAdd,int MaxColors, out HashSet<T> notColored) {
-
+            
             notColored = new HashSet<T>();
             var map = new List<HashSet<T>>();
             var sortedIndex = SortVertex();
             int[] isColored = new int[sortedIndex.Length];
             int colors = 0;
-            int noOfVertex;
             for (int i = 0; i < sortedIndex.Length; i++) {
-                noOfVertex = 0;
                 if (isColored[sortedIndex[i]] != 0)
                     continue;
                 isColored[sortedIndex[i]] = ++colors;
                 T present = repVertex.First(x => x.Value == sortedIndex[i]).Key;
-                map.Add(new HashSet<T> { present });
+                map.Add(new HashSet<T> { present });             
                 for (int j = i + 1; j < sortedIndex.Length ; j++) {
                     T courseToBeAdded = repVertex.First(x => x.Value == sortedIndex[j]).Key;
                     if ( isColored[j] == 0) {
@@ -76,14 +74,14 @@ namespace SchedulingSystem {
                         foreach(T oldCourse in map[map.Count - 1]) {
                             if (CheckEdge(oldCourse, courseToBeAdded)) {
                                 carryOn = false;
+                                break;
                             }
                         }
                         if (!carryOn)
                             continue;
                         if (CanAdd(courseToBeAdded, map[map.Count - 1])){
                             isColored[j] = colors;
-                            map[map.Count - 1].Add(courseToBeAdded);
-                            noOfVertex++;
+                            map[map.Count - 1].Add(courseToBeAdded);                         
                         }
                     }
 
