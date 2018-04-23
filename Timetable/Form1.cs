@@ -55,5 +55,16 @@ namespace Timetable {
             DialogResult a = fd.ShowDialog();
             textBox2.Text = fd.FileName;
         }
+
+        private void Form1_Load(object sender, EventArgs e) {
+            checkedListBox1.Items.Clear();
+            checkedListBox1.Items.Add("Monday", true);
+            checkedListBox1.Items.Add("Tuesday", true);
+            checkedListBox1.Items.Add("Wednesday", true);
+            checkedListBox1.Items.Add("Thursday", true);
+            checkedListBox1.Items.Add("Friday", true);
+            checkedListBox1.Items.Add("Saturday", false);
+            checkedListBox1.Items.Add("Sunday", false);
+        }
     }
 }
