@@ -118,6 +118,9 @@ namespace SchedulingSystem {
                             if (ignor[c] == 0) {
                                 ignor.Remove(c);
                             }
+                            if (c.WeeklyHours/LoP>5&&(c.WeeklyHours-5)==ignor[c]) {
+                                ignor.Remove(c);
+                            }
                         } else {
                             ignor.Add(c, -1);
                         }
